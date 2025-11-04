@@ -51,93 +51,50 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int INF = 1e18;
+const int MAX = 2e5+7;
 
-int calc(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
-    int ans = 0;
-    int cntA = (a + k - 1) / k;
-    int cntB = (b + k - 1) / k;
-    int cntC = (c + k - 1) / k;
-
-    ans += cntA + cntB + cntC;
-    int remA = cntA*k - a;
-    int remB = cntB*k - b;
-    int remC = cntC*k - c;
-    //restante livre em cada letra
-
-    //preencher bc em c
-    int needC = min(remC, bc);
-    remC -= needC;
-    bc -= needC;
-
-    //preencher bc em b
-    int needB = min(remB, bc);
-    remB -= needB;
-    bc -= needB;
-
-    //se ainda tem bc preciso passar para B
-    if(bc > 0) {
-        int cntBC = (bc + k - 1) / k;
-        ans += cntBC;
-        remB += cntBC * k - bc; 
-        bc = 0; // bc foi todo processado
+void solve(){   
+    int n, m;
+    cin >> n >> m;
+    map<int,vector<int>> shafts;
+    vector<int> score(n,0);//score atualmente no shaft n
+    vector<tuple<int,int,int>> tunnels(m);
+    for (int i = 0; i < m; i++){
+        int l, r, v;
+        cin >> l >> r >> v;
+        l--;
+        r--;
+        tunnels[i] = {l,r,v};
+        shafts[l].push_back(i);
+        shafts[r].push_back(i);
     }
+    for (int i = m-1; i >= 0; i--){
+        //olhar o proximo tunel abaixo de mim e somar o score dele no meu do lado oposto
+        auto [l,r,v] = tunnels[i];
+        debug(i, l, r);
 
-    //preencher c e b com abc
-    int needABC = min(abc, remC);
-    abc -= needABC;
-    remC -= needABC;
-    
-    //o que sobrou vai pra B
-    int needABC2 = min(abc, remB);
-    abc -= needABC2;
-    remB -= needABC2;
+        int sl = score[l];
+        int sr = score[r];
 
-    //preenchendo c com ac
-    int needAC = min(ac, remC);
-    ac -= needAC;
-    remC -= needAC;
-    
-    //preenchendo b com ab
-    int needAB = min(ab, remB);
-    ab -= needAB;
-    remB -= needAB;
-    
-    //pega o que soborou e que TEM que ir pra A
-    int left = ab + ac + abc;
-    int needA = min(left, remA);
-    remA -= needA;
-    left -= needA;
-    ans += (left + k - 1) / k;
-
-    debug(ans, remA, remB, remC, left);
-    return ans;
-}
-
-
-void solve(){
-    int k;
-    cin >> k;
-    int a, b, c, ab, ac, bc, abc;
-    cin >> a >> b >> c >> ab >> bc >> ac >> abc;
-
-    int best = INF;
-
-    best = min({best,
-        calc(a,b,c,ab,bc,ac,abc,k), 
-        calc(a,c,b,ac,bc,ab,abc,k), 
-        calc(b,a,c,ab,ac,bc,abc,k), 
-        calc(b,c,a,bc,ac,ab,abc,k), 
-        calc(c,a,b,ac,ab,bc,abc,k), 
-        calc(c,b,a,bc,ab,ac,abc,k)
-    });
+        score[l] = v + sr;
+        score[r] = v + sl;
  
-    debug(best);
-    cout << best << endl;
+        debug(score);
+        debug(i, l, score[l], r, score[r]);
+    }
+    debug(score);
+    int ans = 0;
+    for (int i = 0; i < n; i++){
+        ans = max(ans, score[i]);
+        debug(i, shafts[i]);
+    }
+    cout << ans << endl;
+    // debug(tunnels);
 }
+
 signed main(){
     winton;
     int t;
     cin >> t;
-    while(t--) solve();
+    while(t--)solve();
 }
