@@ -1,0 +1,5 @@
+diff file_name1 file_name2
+	-c prints all the contents and highlight discrepancies
+	-i ignore case sensitivity
+time command_or_script
+	Exemplo: time ./a.out < input
