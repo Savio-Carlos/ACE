@@ -12,8 +12,6 @@ priority_queue
 v1, posicao inicial, momento q foi removido
 */
 
-
-
 void solve(){
     int n; cin >> n;
     vector<vector<int>> elim(n+2);
