@@ -1,0 +1,9 @@
+#!/bin/bash
+
+nome_arq="$1"
+temp="/home/ubuntu-wsl/maratona/RESOURSES/template.cpp"
+
+if [ "$#" -eq 0 ]
+then echo "Cade do nome do arquivo fdp"
+fi
+cat "$temp" > "$nome_arq".cpp
