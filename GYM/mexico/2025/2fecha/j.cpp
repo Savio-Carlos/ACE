@@ -24,7 +24,7 @@ signed main(){
     fastio;
     int q; cin >> q;
     vector<int> fat(MAXN, 0), inv(MAXN, 0);
-    fat[0] = 0;
+    fat[0] = 1;
     fat[1] = 1;
     inv[0] = fastexpo(fat[0], MOD-2);
     inv[1] = fastexpo(fat[1], MOD-2);
