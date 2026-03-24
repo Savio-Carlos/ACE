@@ -23,28 +23,14 @@ void dbg_out(H h, T... t) { cerr << ' ' << h; dbg_out(t...); }
 
 signed main(){
     fastio;
-    int n;
-    cin >> n;
-    vector<pair<int,int>> a(n);
-    int s = 0, p = 0;
+    int n; cin >> n;
+    int sa = 0, sb = 0, m = 0;
     for (int i = 0; i < n; i++){
-        auto &[pp, ss] = a[i];
-        cin >> pp >> ss;
-        p += pp;
-        s += ss;
+        int x, y; cin >> x >> y;
+        sa += x;
+        sb += y;
+        m = max(m, x + y);
     }
-    int ans = 0;
-    for (int i = 0; i < n; i++){
-        auto &[pp, ss] = a[i];
-         
-        int outros = s - ss;
-        int diff = abs(pp-outros);
-        if (pp > outros){
-            s += diff;
-            p -= pp;
-            s -= pp;
-            ans += diff;
-        }
-    }
-    cout << ans + abs(p-s) << endl;
+
+    cout << max(abs(sa-sb), 2*m - (sa + sb)) << endl;
 }
