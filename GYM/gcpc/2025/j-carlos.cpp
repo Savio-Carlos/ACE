@@ -5,39 +5,66 @@ using namespace std;
 #define rall(x) x.rbegin(), x.rend()
 #define int long long
 #define ld long double
-#define endl '\n'
+// #define endl '\n'
 
-#define fastio ios_base::sync_with_stdio(false),cin.tie(0),cout.tie(0)
+#define fastio ios_base::sync_with_stdio(false),cin.tie(0)
 
 signed main(){
     fastio;
     int n;
     string instruction, s;
     cin >> instruction >> n >> s;
-   
+    
+    auto checkzero = [&] () -> bool{
+        int cnt = 0;
+        for (auto c : s) if(c == '0') cnt++;
+        return cnt == n;
+    };
+
+    if(checkzero()){
+        cout << s << endl;
+        return 0;
+    }
+
+
     if (instruction == "Encode"){
         string r = s;
-        if(s.find("1") == string::npos){
-            cout << s << endl;
-            return 0;
-        }
         int i = 0;
         while(i < n && s[i] == '0') r[i++] = '2';
         if (i < n && r[i] == '1') r[i] = '2';
         cout << r << endl;
     }
     else{
-        int i = 0; 
-        string r = s;   
-        
-        while(i < n && s[i] != '2') i++;
-        while(i < n && s[i] == '2'){
-            r[i] = '0';
-            i++;
+        if (count(all(s), '2') == n){
+            for (int i = 0; i < n-1; i++) cout << '0';
+            cout << '1' << endl;
+            return 0;
         }
-        if (i-1 < n) r[i-1] = '1';
-        cout << r << endl;
-    }
+        string r = s;
 
+        int p = 0;
+        for (int i = 0; i < n; i++) if(s[i] != '2'){ 
+            p = i; 
+            break; 
+        }
+        int bs = p;
+        for (int j = 1; j <= n; j++) if(s[(p+j)%n] == '2'){
+            bs = (p+j)%n; 
+            break; 
+        }
+        
+        int st = bs;
+        for (int j = 1; j < n; j++){
+            int pos = (bs+j)%n;
+            if(s[pos] == '2') st = pos;
+            else break;
+        }
+        r[st] = '1';
+        for(auto &c : r) if(c == '2') c = '0';
+        for (int i = 0; i < n; i++){
+            cout << r[(i+bs)%n];
+        }
+        cout << endl;
+    }
 }
 
