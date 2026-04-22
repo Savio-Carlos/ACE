@@ -65,15 +65,21 @@ using namespace dbg;
 
 
 /*debug mais simples, so imprime vars mas imprime organizado na linha, menor e mais facil de codar*/
-void debug_out(string s, int line) {cerr << endl; }
+void debug_out(string s, int line) { cerr << endl; }
 template<typename H, typename... T>
 void debug_out(string s, int line, H h, T... t){
-    do{
-        cerr << line << ": " << s[0]; s = s.substr(1);
+    cerr << line << ": ";
+    while (!s.empty() && s[0] == ' ') s = s.substr(1);
+    int pos = 0;
+    int bracket = 0;
+    while (pos < (int)s.size() && (s[pos] != ',' || bracket > 0)) {
+        if (s[pos] == '(' || s[pos] == '[' || s[pos] == '{') bracket++;
+        if (s[pos] == ')' || s[pos] == ']' || s[pos] == '}') bracket--;
+        pos++;
     }
-    while (sz(s) and s[0] != ',');
-    cerr << " = " << h;
-    debug_out(s, line, t...);
+    cerr << s.substr(0, pos) << " = " << h;
+    if (sizeof...(t)) cerr << " | ";
+    debug_out(pos < (int)s.size() ? s.substr(pos + 1) : "", line, t...);
 }
 
 #define DEBUG
