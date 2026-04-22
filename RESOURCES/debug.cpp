@@ -71,7 +71,7 @@ void debug_out(string s, int line, H h, T... t){
     do{
         cerr << line << ": " << s[0]; s = s.substr(1);
     }
-    while (sz(s) and s[0] != ',');
+    while (s.size() and s[0] != ',');
     cerr << " = " << h;
     debug_out(s, line, t...);
 }
