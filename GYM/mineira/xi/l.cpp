@@ -1,86 +1,116 @@
 #include <bits/stdc++.h>
 using namespace std;
- 
+
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
 #define int long long
 #define ld long double
- 
-void debug_out(string s, int line) { cerr << endl; }
-template<typename H, typename... T>
-void debug_out(string s, int line, H h, T... t){
-    cerr << line << ": ";
-    while (!s.empty() && s[0] == ' ') s = s.substr(1);
-    int pos = 0;
-    int bracket = 0;
-    while (pos < (int)s.size() && (s[pos] != ',' || bracket > 0)) {
-        if (s[pos] == '(' || s[pos] == '[' || s[pos] == '{') bracket++;
-        if (s[pos] == ')' || s[pos] == ']' || s[pos] == '}') bracket--;
-        pos++;
+
+namespace dbg {
+    const char* const RESET     = "\033[0m";
+    const char* const BOLD_BLUE = "\033[1;34m";
+    const char* const YELLOW    = "\033[33m";
+    const char* const BOLD_WHITE= "\033[1;37m";
+
+    template<typename T1, typename T2>
+    ostream& operator<<(ostream& os, const pair<T1, T2>& p);
+
+    template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
+    ostream& operator<<(ostream& os, const T_container& v) {
+        os << '{';
+        bool first = true;
+        for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
+        return os << '}';
     }
-    cerr << s.substr(0, pos) << " = " << h;
-    if (sizeof...(t)) cerr << " | ";
-    debug_out(pos < (int)s.size() ? s.substr(pos + 1) : "", line, t...);
-}
- 
+
+    template<typename T1, typename T2>
+    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
+
+    void debug_out(string_view) { cerr << endl; }
+    template<typename H, typename... T>
+    void debug_out(string_view s, H h, T... t) {
+        auto cpos = s.find(',');
+        cerr << YELLOW << s.substr(0, cpos) << RESET << " = ";
+        cerr << BOLD_WHITE << h << RESET;
+        if constexpr (sizeof...(t) > 0) {
+            cerr << ", ";
+            auto nx = s.find_first_not_of(" \t\n\r", cpos + 1);
+            debug_out(s.substr(nx), t...);
+        } else {
+            cerr << endl;
+        }
+    }
+} 
+using namespace dbg;
+
 // #define DEBUG
- 
+
 #if defined(DEBUG)
-    #define fastio (void)0
-    #define debug(...) debug_out(#__VA_ARGS__, __LINE__, __VA_ARGS__)
+    #define winton (void)0
+    #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
 #else
-    #define fastio ios_base::sync_with_stdio(false), cin.tie(NULL)
+    #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
     #define debug(...) (void)0
 #endif
 
 signed main(){
-    fastio;
+    winton;
     int n, q;
     cin >> n >> q;
-
-    vector<vector<int>> children(n + 1);
-    for(int i = 2; i <= n; i++){
-        int p;
-        cin >> p;
-        children[p].push_back(i);
+    vector<vector<int>> graph(n + 1);
+    for (int i = 2; i <= n; i++){
+        int x;
+        cin >> x;
+        graph[x].push_back(i);
     }
 
-    vector<int> tin(n + 1), tout(n + 1);
+    vector<int> tin(n+1), tout(n+1);
     int timer = 0;
 
-    stack<pair<int,int>> stk;
-    stk.push({1, 0});
-    tin[1] = timer++;
-    while(!stk.empty()){
-        auto& [u, idx] = stk.top();
-        if(idx < (int)children[u].size()){
-            int v = children[u][idx++];
-            tin[v] = timer++;
-            stk.push({v, 0});
-        } else {
-            tout[u] = timer++;
-            stk.pop();
+    function<void(int, int)> dfs = [&](int v, int p) {
+        tin[v] = ++timer;
+        for (auto u :graph[v]){
+            if (u == p) continue;
+            dfs(u,v);
         }
-    }
+        tout[v] = timer;
+    };
+
+    dfs(1,0);
+
+
 
     while(q--){
         int m;
         cin >> m;
-        vector<int> s(m);
-        for(int i = 0; i < m; i++) cin >> s[i];
+        vector<int> a(m);
+        for (auto &u : a) cin >> u;
+        
+        sort(all(a), [&](int x, int y){ return ((tout[x] - tin[x]) < (tout[y] - tin[y])); });
+        debug(a);
 
-        sort(all(s), [&](int a, int b){
-            return tin[a] < tin[b];
-        });
+        set<pair<int,int>> cur;
 
-        int cnt = 0;
-        for(int i = 0; i + 1 < m; i++){
-            if(tin[s[i]] <= tin[s[i+1]] && tout[s[i]] >= tout[s[i+1]]){
-                cnt++;
+        for (auto u : a){
+            auto it = cur.lower_bound({tin[u], -1});
+            bool overlap = false;
+
+            if (it != cur.end() && it->first <= tout[u]) {
+                overlap = true;
+            }
+
+            if (it != cur.begin()) {
+                auto pv = prev(it);
+                if (pv->second >= tin[u]) {
+                    overlap = true;
+                }
+            }
+
+            if (!overlap) {
+                cur.insert({tin[u], tout[u]});
             }
         }
-
-        cout << m - cnt << endl;
+        cout << cur.size() << endl;
     }
 }
