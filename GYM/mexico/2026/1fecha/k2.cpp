@@ -99,7 +99,7 @@ signed main(){
     bool inside = true;
     for (int j = 0; j < n; j++){
         auto [ponto2, raio2] = pts[j];
-        if (dist(st, ponto2) - eps > raio2) inside = false;
+        if (dist(st, ponto2) > raio2) inside = false;
         
     }
 
@@ -113,13 +113,11 @@ signed main(){
         auto [ponto, raio] = pts[i];
         line t(st, ponto);
         auto inter = circ_line_inter(t.p, t.q, ponto, raio);
+        
         if (inter.empty()) continue;
         point intersecao = inter[0];
         point interseca2 = inter[1];
-
         // cout << intersecao << endl;
-        // cout << interseca2 << endl;
-
         bool pos = true;
         bool pos2 = true;
         for (int j = 0; j < n; j++){
@@ -127,13 +125,13 @@ signed main(){
             auto [ponto2, raio2] = pts[j];
             if (dist(intersecao, ponto2) > raio2) pos = false;
             if (inter.size() > 1 && dist(interseca2, ponto2) > raio2) pos2 = false;
-        }
+        }   
 
         if (pos){
-            ans = min(ans, dist(st, intersecao) - eps);
+            ans = min(ans, dist(st, intersecao));
         }
         if (pos2){
-            ans = min(ans, dist(st, interseca2) - eps);
+            ans = min(ans, dist(st, interseca2));
         }
     }
 
@@ -156,11 +154,15 @@ signed main(){
         bool pos = true;
         for (int j = 0; j < n; j++){
             auto [ponto2, raio2] = pts[j];
-            if (dist(ponto1, ponto2) - eps > raio2) pos = false;
+            if (dist(ponto1, ponto2) > raio2){
+                pos = false;
+                break;
+            } 
             
         }
+
         if (pos){
-            ans = min(ans, dist(st, ponto1) - eps);
+            ans = min(ans, dist(st, ponto1));
         }
     }
 

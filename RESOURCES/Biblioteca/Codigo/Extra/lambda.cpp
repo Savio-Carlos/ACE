@@ -13,6 +13,13 @@ auto lambda_recursiva = [&](auto &&self, int x) -> int {
     return x * self(self, x - 1);
 };
 
+function<void(int, int)> dfs = [&](int v, int p) {
+    for (auto u :graph[v]){
+        if (u == v) continue;
+        dfs(u,v);
+    }
+};
+
 auto reduce = [&](const multiset<string> &ms) -> multiset<int> {
     multiset<int> mi;
     for (const auto &s : ms) {
@@ -25,3 +32,4 @@ auto reduce = [&](const multiset<string> &ms) -> multiset<int> {
     }
     return mi;
 };
+
