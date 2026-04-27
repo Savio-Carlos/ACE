@@ -99,7 +99,7 @@ signed main(){
     bool inside = true;
     for (int j = 0; j < n; j++){
         auto [ponto2, raio2] = pts[j];
-        if (dist(st, ponto2) > raio2) inside = false;
+        if (dist(st, ponto2) - eps > raio2) inside = false;
         
     }
 
@@ -123,8 +123,8 @@ signed main(){
         for (int j = 0; j < n; j++){
             if (i == j) continue;
             auto [ponto2, raio2] = pts[j];
-            if (dist(intersecao, ponto2) > raio2) pos = false;
-            if (inter.size() > 1 && dist(interseca2, ponto2) > raio2) pos2 = false;
+            if (dist(intersecao, ponto2) - eps > raio2) pos = false;
+            if (inter.size() > 1 && dist(interseca2, ponto2)  - eps > raio2) pos2 = false;
         }   
 
         if (pos){
@@ -149,12 +149,15 @@ signed main(){
         }
     }
 
+        sort(all(teste));
+    teste.erase(unique(all(teste)), teste.end());
+
     for (int i = 0; i < teste.size(); i++){
         auto ponto1 = teste[i];
         bool pos = true;
         for (int j = 0; j < n; j++){
             auto [ponto2, raio2] = pts[j];
-            if (dist(ponto1, ponto2) > raio2){
+            if (dist(ponto1, ponto2) - eps > raio2){
                 pos = false;
                 break;
             } 
