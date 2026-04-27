@@ -56,61 +56,54 @@ using namespace dbg;
 
 signed main(){
     winton;
-    int n, d; 
-    cin >> n >> d;
-    map<int,vector<int>> mp;
-    int minmex = 0;
-    set<int> temp;
-    for(int i = 0; i < n; i++){
-        int x;
-        cin >> x;
-        temp.insert(x);
-        while(temp.count(minmex)) minmex++;
-        mp[x].push_back(i);
+    int n, p; 
+    cin >> n >> p;
+
+    vector<int> l(n + 1);
+    for (int i = 1; i <= n; i++) cin >> l[i];
+
+    vector<int> pos(p + 1);
+    vector<string> w(p + 1);
+    for (int i = 1; i <= p; i++) {
+        int x; string s;
+        cin >> x >> s;
+        pos[x] = i;
+        w[x] = s;
     }
 
-    auto check = [&] (int v) -> bool{
-        auto a = mp[v];
-        debug(v, a, d);
-        int l, r, free = 0;
-        priority_queue<int, vector<int>, greater<int>> pq(all(a));
 
-        while(!pq.empty()){
-            if (pq.top() < free) return false;
+    vector<int> nx(n + 1), pv(n + 1);
+    for (int i = 1; i <= n; i++) {
+        nx[i] = (i == n ? 1 : i + 1);
+        pv[i] = (i == 1 ? n : i - 1);
+    }
 
-            l = pq.top();
-            r = l + d - 1;
-            pq.pop();
+    int a = n, c = 1, x = 1, lf = -1;
+    int st = 0;
 
-            int last = l;
-            while(!pq.empty() && pq.top() <= r){
-                last = pq.top();
-                pq.pop();
+    while (a > 1) {
+        if (pos[x] > p - l[c]) {
+            c = nx[c];
+            x++;
+            if (x > p) x = 1;
+            st++;
+            if (st >= a * p) {
+                cout << -1 << endl;
+                return 0;
             }
-            debug(l, r, last);
-            int diff_start = l - free;
-            int diff_end = r - last;
-
-            if (diff_start < diff_end){
-                l = free;
-                r = l + d - 1;
-            }
-            else{
-                r = last;
-                l = r - d + 1;
-            }
-            free = min<int>(n, r + d + 1);
-            debug(l, r, free);
-        }
-        return true;
-    };
-
-    int ans = minmex;
-    for(int v = 0; v < minmex; v++) {
-        if (check(v)) {
-            ans = v;
-            break;
+        } 
+        else {
+            lf = x;
+            int ll = pv[c], rr = nx[c];
+            nx[ll] = rr;
+            pv[rr] = ll;
+            a--;
+            c = rr;
+            x++;
+            if (x > p) x = 1;
+            st = 0;
         }
     }
-    cout << ans << endl;
+    cout << c << endl;
+    cout << w[lf] << endl;
 }
