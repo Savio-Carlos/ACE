@@ -15,23 +15,12 @@ vector<int> graph[MAXN];
 
 int ganha(vector<int> g){
     vector<vector<int>> grid(3, vector<int>(3, 100));
-    // for(int i = 0; i < 9; i++) cout << g[i] << " ";
-    // cout << endl;
     for(int i = 0; i < 3; i++){
         grid[0][i] = g[i]; 
         grid[1][i] = g[i+3];
         grid[2][i] = g[i+6];
     }   
 
-    for(int i = 0; i < 3; i++){
-        for(int j = 0; j < 3; j++){
-            cout << grid[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
-
-    cout << "EMPATOU?" << endl;
     for(int i = 0; i < 3; i++){
         if(grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2] && grid[i][2] != 100) return grid[i][2];
     }
@@ -43,7 +32,6 @@ int ganha(vector<int> g){
     if(grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2] && grid[2][2] != 100) return grid[2][2];
 
     if(grid[2][0] == grid[1][1] && grid[0][2] == grid[1][1] && grid[1][1] != 100) return grid[1][1];
-    cout << "EMPATOU " << endl;
     return 2;
 }
 
@@ -62,14 +50,15 @@ int dfs(vector<int> grid, int mask, int v, int turno, vector<int> indeg){
         else indeg[u]--; 
     }
 
-    int ans = !turno;
+    int ans = turno;
+    int nxt = !turno;
     int pos = 0;
     for(int i = 0; i < 9; i++){
         //posso visitar
         if(!(mask &(1<<i)) && indeg[i] == 0){
             pos = 1;
             int res = dfs(grid, mask, i, !turno, indeg);
-            if(res == turno) return res;
+            if(res == nxt) return res;
             if(res == 2) ans = 2;
         }
     }
@@ -78,7 +67,7 @@ int dfs(vector<int> grid, int mask, int v, int turno, vector<int> indeg){
 }
 
 signed main(){
-    //fastio;
+    fastio;
     int n; cin >> n;
     vector<int> indeg(10, 0),visited(10, 0);
     for(int i = 0; i < n; i++){
@@ -90,7 +79,7 @@ signed main(){
 
     queue<int> q;
     vector<int> indeg2(10, 0);
-    for(int i = 0; i < n; i++){
+    for(int i = 0; i < 9; i++){
         indeg2[i] = indeg[i];
         if(indeg[i] == 0){
             q.push(i);
@@ -114,9 +103,10 @@ signed main(){
     }
 
     vector<int> grid(10, 100);
-    int ans = 0;
+    int ans = 0, pos = 0;
     for(int i = 0; i < 9; i++){
         if(indeg2[i] == 0){
+            pos = 1;
             int v = dfs(grid, mask, i, 0, indeg2);
             if(v == 0){
                 cout << "X\n";
@@ -126,6 +116,6 @@ signed main(){
         }
     }
 
-    if(ans == 2) cout << "E\n";
+    if(!pos || ans == 2) cout << "E\n";
     else cout << "O\n";
 }
