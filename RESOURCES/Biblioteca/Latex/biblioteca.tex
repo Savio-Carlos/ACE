@@ -66,612 +66,6 @@ basicstyle=\ttfamily\footnotesize, % fonte
 
 %%%%%%%%%%%%%%%%%%%%
 %
-% Strings
-%
-%%%%%%%%%%%%%%%%%%%%
-
-\section{Strings}
-
-\subsection{arrumar tudo essa porra de hashing depois}
-\begin{lstlisting}
-295 vector<int> rabin_karp(string const& s, string const& t) {
-2b7     int S = s.size(), T = t.size();
-            
-d52     vector<int> p_pow(max(S, T)); 
-b60     p_pow[0] = 1; 
-8db     for (int i = 1; i < (int)p_pow.size(); i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
-        
-404     vector<int> h(T + 1, 0); 
-a59     for (int i = 0; i < T; i++) h[i+1] = (h[i] + (t[i] - 'a' + 1) * p_pow[i]) % MOD; //hash do texto(vetor a)
-        
-2d8     int h_s = 0; 
-535     for (int i = 0; i < S; i++) h_s = (h_s + (s[i]- 'a' + 1) * p_pow[i]) % MOD; //hash da string s (vetor b)
-        
-a15     vector<int> occurrences;
-fce     for (int i = 0; i + S - 1 < T; i++) {
-d38         int cur_h = (h[i+S] + MOD - h[i]) % MOD;
-7f5         if (cur_h == h_s * p_pow[i] % MOD) occurrences.push_back(i);
-77b     }
-831     return occurrences;
-78d }
-
-
-//struct para um vetor de strings
-//consegue retornar um vetor sem as strings que sao substrings de outras
-//consegue checar se o prefixo de uma string e o sufixo de outra
-
-803 struct hashing {
-2a9     int p_pow[MAX]; 
-52b     vector<int> hashes[11];
-3df     vector<string> strings;
-1a8     int n;
-        
-f09     hashing(int _n, vector<string> _a) : n(_n), strings(_a) {} 
-    
-0a8     void build(){
-b60         p_pow[0] = 1; 
-    
-2cf         for (int i = 1; i < MAX; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
-bde         for (int i = 0; i < n; i++)hashes[i] = calcHash(strings[i]);
-e10     }
-    
-e10     vector<string> trim(){
-86b         vector<string> ret;
-            //funcao pra remover do vetor original as strings que sao substrings de outras
-            //nao preciso delas pra fazer a verificacao depois
-3c4         set<int> occurrences;
-603         for (int i = 0; i < n; i++){
-578             for (int j = 0; j < n; j++){
-4ce                 if (i == j) continue;
-680                 int S = strings[i].size(), T = strings[j].size();
-d36                 int h_s = hashes[i][S];
-568                 for (int k = 0; k + S - 1 < T; k++) {
-df2                     int cur_h = (hashes[j][k+S] + MOD - hashes[j][k]) % MOD;
-f30                     if (cur_h == h_s * p_pow[k] % MOD) occurrences.insert(i);
-e4e                 }
-b00             }
-f98         }
-603         for (int i = 0; i < n; i++){
-851             if (occurrences.find(i) != occurrences.end()) continue;
-07c             ret.push_back(strings[i]);
-aa6         }
-9ca         debug(occurrences);
-edf         return ret;
-391     }
-        
-5ae     vector<int> calcHash(string s){
-fa3         vector<int> h(s.size() + 1, 0); 
-18f         for (int i = 0; i < s.size(); i++) h[i+1] = (h[i] + (s[i] - 'a' + 1) * p_pow[i]) % MOD;
-81c         return h;
-a53     }
-        
-4c8     int get_hash(int l, int len, int idx){
-488         int r = l + len;
-915         return ((hashes[idx][r] + MOD - hashes[idx][l]) % MOD);
-96f     }
-    
-166     bool equal_substrings(int len, int i, int j) {
-2bf         if (!len) return true;
-    
-34c         int h1 = get_hash(0, len, i);
-393         int h2 = get_hash(strings[j].size() - len, len, j);
-    
-21f         int left  = (h1 * p_pow[strings[j].size()-len]) % MOD;
-eeb         int right = (h2) % MOD;
-7ef         return left == right;
-bda     }
-890 };
-
-//struct de hashing pra uma string so
-803 struct hashing {
-bfe     vector<int> h, p_pow;
-ac0     string s;
-1a8     int n;
-        
-e68     hashing(string _s) : n(_s.size()), s(_s), h(_s.size()+1, 0), p_pow(_s.size(), 0) {} 
-    
-0a8     void build(){
-b60         p_pow[0] = 1; 
-    
-25f         for (int i = 1; i < n; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
-18f         for (int i = 0; i < s.size(); i++) h[i+1] = (h[i] + (s[i] - 'a' + 1) * p_pow[i]) % MOD;
-6c1     }
-        
-    
-77c     int get_hash(int l, int len){
-488         int r = l + len;
-9c5         return ((h[r] + MOD - h[l]) % MOD);
-2b2     }
-    
-a15     bool equal_substrings(int len) {
-2bf         if (!len) return true;
-    
-925         int h1 = get_hash(0, len);
-8f8         int h2 = get_hash(n - len, len);
-    
-ba9         int left  = (h1 * p_pow[n-len]) % MOD;
-eeb         int right = (h2) % MOD;
-7ef         return left == right;
-c7c     }
-e94 };
-\end{lstlisting}
-
-\subsection{implementacao do cp-algorithms}
-\begin{lstlisting}
-737     int n = (int)s.length();
-d93     vector<int> pi(n);
-6f5     for (int i = 1; i < n; i++) {
-3f8         int j = pi[i-1];
-a2c         while (j > 0 && s[i] != s[j])
-25c             j = pi[j-1];
-f36         if (s[i] == s[j])
-04b             j++;
-d2e         pi[i] = j;
-a4e     }
-81d     return pi;
-cbb }
-    
-    //implementacao minha
-6cc vector<int> kmp(string s){
-357     int n = s.size(), pfxlen = 0;
-ca9     vector<int> a(n, 0);
-6f5     for (int i = 1; i < n; i++){
-e60         if (s[i] == s[pfxlen]) a[i] = ++pfxlen;
-7f3         else if (pfxlen){
-6b3             pfxlen = a[pfxlen-1];
-169             i--;
-4de         }
-409         else a[i] = 0;
-535     }
-3f5     return a;
-836 }
-\end{lstlisting}
-
-\subsection{Manacher}
-\begin{lstlisting}
-/*
-8fa Manacher para achar todos os palindromes e depois reconstruir eles
-48b Nao e eficiente pois utiliza substr O(size)
-c4c */
-
-fd3 vector<int> manacher_odd(string s) {
-163     int n = s.size();
-0cb     s = "$" + s + "^";
-1a9     vector<int> p(n + 2);
-187     int l = 0, r = 1;
-78a     for(int i = 1; i <= n; i++) {
-a1d         p[i] = min(r - i, p[l + (r - i)]);
-ce7         while(s[i - p[i]] == s[i + p[i]]) {
-fbd             p[i]++;
-dc2         }
-03e         if(i + p[i] > r) {
-26d             l = i - p[i];
-a69             r = i + p[i];
-4cc         }
-283     }
-fa1     return vector<int>(begin(p) + 1, end(p) - 1);
-08d }
-
-4e5 vector<int> manacher(string s) {
-78f     string t;
-7e7     for(auto c: s) {
-870         t += string("#") + c;
-478     }
-9cc     auto res = manacher_odd(t + "#");
-b50     return res;
-cdc }
-
-0dd signed main() {
-5d6     winton;
-ac0     string s;
-a18     cin >> s;
-    
-bf9     vector<int> mnc = manacher(s);
-35c     vector<pair<int,int>> palindromes;
-63e     for (int i = 0; i < mnc.size(); i++){
-1e8         if (mnc[i]-1 > 0){
-8ad             palindromes.push_back({mnc[i]-1,i});//guarda os palindromes com {tamanho, centro}
-ad1         }
-b1c     }
-    
-668     sort(rall(palindromes));//ordena pelos maiores(opicional ne)
-603     for (auto &[size, centro] : palindromes){
-    
-04c         string pos;
-3f0         int st = ((centro - size)/2);
-ab5         pos = s.substr(st, size); //gera a substring daquele palindrome
-2dc     }
-bf9 }
-\end{lstlisting}
-
-\subsection{StringStream}
-\begin{lstlisting}
-141 vector<string> split_sentence(string s){
-942     stringstream ss(s);
-    
-6de     string word;
-    
-622     vector<string> v;
-    
-dac     while(getline(ss, word, ' ')){
-e6c         v.push_back(word);
-8e0     }
-6dc     return v;
-c7e }
-\end{lstlisting}
-
-
-
-%%%%%%%%%%%%%%%%%%%%
-%
-% Estrutura de Dados
-%
-%%%%%%%%%%%%%%%%%%%%
-
-\section{Estrutura de Dados}
-
-\subsection{BIT}
-\begin{lstlisting}
-// BIT de xor 1-based
-// faz o xor no intervalo
-//
-// Complexidades:
-// build - O(n)
-// update - O(log(n))
-// query - O(log(n))
- 
-8eb struct Bit {
-1a8 	int n;
-116 	vector<int> bit;
-e86 	Bit(int _n=0) : n(_n), bit(n + 1) {}
-cf6 	void update(int i, int x) { // xor x na posicao i
-f0e 		for (i; i <= n; i += i & -i) bit[i] ^= x;
-2a0 	}
-cdb 	int pref(int i) { // xor [0, i]
-7c9 		int ret = 0;
-653 		for (i; i; i -= i & -i) ret ^= bit[i];
-edf 		return ret;
-7d1 	}
-9e3 	int query(int l, int r) {  // xor [l, r]
-da4         debug(pref(r), pref(l-1));
-872 		return pref(r) ^ pref(l - 1); 
-10d 	}
-3d4 };
-\end{lstlisting}
-
-\subsection{SegTree Add}
-\begin{lstlisting}
-//Get o caminho 
-
-7e4 tree[4*MAX];
-
-037 void build(int node, int l, int r){
-893     if (l == r){
-c91         tree[node] = 0;//alguma coisa
-505         return;
-447     }
-ee4     int m = (l+r)/2;
-435     build(node*2, l, m);
-4c9     build(node*2+1, m+1, r);
-452 }
-
-10d int get(int node, int l, int r, int i){
-a15     if (l == r) return tree[node];
-ee4     int m = (l+r)/2;
-7c4     int res;
-979     if (i > m) res = get(node*2+1, m+1, r, i);
-d04     else res = get(node*2, l, m, i); 
-eac     return res + tree[node];
-ca6 }
-
-506 void add(int node, int l, int r, int a, int b, int x){
-1dd     if(b < l or r < a) return;
-02b     if(a <= l && r <= b){
-3c6         tree[node] += x;
-505         return;
-5cc     }
-ee4     int m = (l+r)/2;
-3da     add(2*node, l, m, a, b, x);
-307     add(2*node+1, m+1, r, a, b, x);
-616 }
-
-5ed add(1,0,n-1, l, r, value)
-1e7 get(1,0,n-1, index_of_search)
-\end{lstlisting}
-
-\subsection{SegTree Bits}
-\begin{lstlisting}
-// v[i] = -1 => posicao invalida (nao conta)
-// v[i] = 0  => desligado
-// v[i] = 1  => ligado
-//
-// build(n2, v2)
-// query(a,b)        -> 1's em [a,b]
-// update(a,b)       -> flip em [a,b]
-// range_set(a,b,x)  -> seta intervalo [a,b] para x (0/1)
-// point_set(i, x)   -> seta posicao i para -1/0/1
-
-fd2 namespace SegTreeBits {
-34a     int tree[4*MAX];       // 1's no intervalo
-692     int valid[4*MAX];      // posicoes validas no intervalo
-7b3     int lazy_set[4*MAX];   // -1 = nenhum, 0 ou 1 = set pendente
-882     int lazy_flip[4*MAX];  // 0/1: flip pendente
-052     int n, *v;
-    
-34c     int build(int node = 1, int l = 0, int r = n-1) {
-a7d         lazy_set[node] = -1;
-8f7         lazy_flip[node] = 0;
-893         if (l == r) {
-edb             if (v[l] == -1) {
-600                 valid[node] = 0;
-c91                 tree[node] = 0;
-af5             } else {
-a5b                 valid[node] = 1;
-efa                 tree[node] = v[l];
-11d             }
-14d             return tree[node];
-d51         }
-ee4         int m = (l + r)/2;
-d58         build(2*node, l, m);
-537         build(2*node+1, m+1, r);
-d5f         valid[node] = valid[2*node] + valid[2*node+1];
-b00         return tree[node] = tree[2*node] + tree[2*node+1];
-1dc     }
-    
-0d8     void build(int n2, int* v2) {
-b77         n = n2; v = v2;
-6f2         build();
-b56     }
-    
-95b     inline void apply_set(int node, int l, int r, int x) {
-c81         tree[node] = valid[node] * x;
-219         lazy_set[node] = x;
-8f7         lazy_flip[node] = 0;
-242     }
-    
-fa1     inline void apply_flip(int node, int l, int r) {
-06b         tree[node] = valid[node] - tree[node];
-c30         if (lazy_set[node] != -1) {
-d5b             lazy_set[node] ^= 1;
-6f5         } else {
-e4d             lazy_flip[node] ^= 1;
-0af         }
-1b7     }
-    
-dd7     void prop(int node, int l, int r) {
-8ce         if (l == r) return;
-ee4         int m = (l + r)/2;
-c30         if (lazy_set[node] != -1) {
-d22             apply_set(2*node, l, m, lazy_set[node]);
-43a             apply_set(2*node+1, m+1, r, lazy_set[node]);
-a7d             lazy_set[node] = -1;
-15e         }
-533         if (lazy_flip[node]) {
-fb9             apply_flip(2*node, l, m);
-d12             apply_flip(2*node+1, m+1, r);
-8f7             lazy_flip[node] = 0;
-9b9         }
-e8b     }
-    
-a2c     int query(int a, int b, int node = 1, int l = 0, int r = n-1) {
-d5e         if (b < l || r < a) return 0;
-675         if (a <= l && r <= b) return tree[node];
-020         prop(node, l, r);
-ee4         int m = (l + r)/2;
-1db         return query(a, b, 2*node, l, m) + query(a, b, 2*node+1, m+1, r);
-05e     }
-    
-2be     int update(int a, int b, int node = 1, int l = 0, int r = n-1) {
-199         if (b < l || r < a) return tree[node];
-02b         if (a <= l && r <= b) {
-fd1             apply_flip(node, l, r);
-14d             return tree[node];
-694         }
-020         prop(node, l, r);
-ee4         int m = (l + r)/2;
-2e4         return tree[node] = update(a, b, 2*node, l, m) + update(a, b, 2*node+1, m+1, r);
-4dd     }
-    
-1fd     int range_set(int a, int b, int x, int node = 1, int l = 0, int r = n-1) {
-199         if (b < l || r < a) return tree[node];
-02b         if (a <= l && r <= b) {
-98a             apply_set(node, l, r, x);
-14d             return tree[node];
-8dc         }
-020         prop(node, l, r);
-ee4         int m = (l + r)/2;
-376         return tree[node] = range_set(a, b, x, 2*node, l, m) + range_set(a, b, x, 2*node+1, m+1, r);
-ea9     }
-    
-22d     int point_set(int idx, int val, int node = 1, int l = 0, int r = n-1) {
-893         if (l == r) {
-a7d             lazy_set[node] = -1;
-8f7             lazy_flip[node] = 0;
-08c             if (val == -1) {
-600                 valid[node] = 0;
-c91                 tree[node] = 0;
-3ca             } else {
-a5b                 valid[node] = 1;
-a24                 tree[node] = val;
-d3e             }
-14d             return tree[node];
-718         }
-020         prop(node, l, r);
-ee4         int m = (l + r)/2;
-dbc         if (idx <= m) point_set(idx, val, 2*node, l, m);
-cac         else point_set(idx, val, 2*node+1, m+1, r);
-d5f         valid[node] = valid[2*node] + valid[2*node+1];
-b00         return tree[node] = tree[2*node] + tree[2*node+1];
-63c     }
-b96 }
-\end{lstlisting}
-
-\subsection{SegTree Iterativa}
-\begin{lstlisting}
-fb1 namespace SegTree {
-1a8     int n;
-8f8     int pot2;
-562     vector<int> tree;
-    
-0d8     void build(int n2, int* v2) {
-1e3         n = n2;
-fa5         pot2 = 1;
-2c6         while (pot2 < n) pot2 <<= 1;
-26a         tree.assign(2 * pot2, 0);
-4e2         for (int i = 0; i < n; ++i) tree[pot2 + i] = v2[i];
-813         for (int i = pot2 - 1; i >= 1; --i) tree[i] = max(tree[2*i], tree[2*i+1]);
-641     }
-    
-4ea     int query(int a, int b) {
-026         if (a > b) return 0;
-238         a += pot2; b += pot2;
-11e         int res = 0;
-cce         while (a <= b) {
-16c             if (a & 1) res = max(res, tree[a++]);
-410             if (!(b & 1)) res = max(res, tree[b--]);
-691             a >>= 1; b >>= 1;
-80e         }
-b50         return res;
-d03     }
-    
-cf6     void update(int i, int x) {
-1a7         int p = i + pot2;
-3bc         tree[p] = x;
-8b8         p >>= 1;
-f77         while (p >= 1) {
-280             tree[p] = max(tree[2*p], tree[2*p+1]);
-8b8             p >>= 1;
-6f4         }
-4ad     }
-092 }
-\end{lstlisting}
-
-\subsection{SegTree Lazy}
-\begin{lstlisting}
-// Recursiva com Lazy Propagation
-// Query: soma do range [a, b]
-// Update: soma x em cada elemento do range [a, b]
-//
-// Complexidades:
-// build - O(n)
-// query - O(log(n))
-// update - O(log(n))
-//
-// build (n, vector)
-// query (int a, int b)
-// update (int a, int b, int x)
-// se for de multiplicacao mudar o lazy pra 1 e tirar o lazy * (r-l+1)
-
-fb1 namespace SegTree {
-d18 	int tree[4*MAX], lazy[4*MAX];
-052 	int n, *v;
-    
-34c 	int build(int node=1, int l=0, int r=n-1) {
-131 		lazy[node] = 0;
-4e3 		if (l == r) return tree[node] = v[l];
-ee4 		int m = (l+r)/2;
-19c 		return tree[node] = build(2*node, l, m) + build(2*node+1, m+1, r);
-851 	}
-0d8 	void build(int n2, int* v2) {
-680 		n = n2, v = v2;
-6f2 		build();
-acb 	}
-dd7 	void prop(int node, int l, int r) {
-7eb 		tree[node] += lazy[node]*(r-l+1);
-17c 		if (l != r) lazy[2*node] += lazy[node], lazy[2*node+1] += lazy[node];
-131 		lazy[node] = 0;
-6eb 	}
-a2c 	int query(int a, int b, int node=1, int l=0, int r=n-1) {
-020 		prop(node, l, r);
-e09 		if (a <= l and r <= b) return tree[node];
-786 		if (b < l or r < a) return 0;
-ee4 		int m = (l+r)/2;
-1db 		return query(a, b, 2*node, l, m) + query(a, b, 2*node+1, m+1, r);
-cf9 	}
-c96 	int update(int a, int b, int x, int node=1, int l=0, int r=n-1) {
-020 		prop(node, l, r);
-9a3 		if (a <= l and r <= b) {
-3bd 			lazy[node] += x;
-020 			prop(node, l, r);
-14d 			return tree[node];
-57d 		}
-ad9 		if (b < l or r < a) return tree[node];
-ee4 		int m = (l+r)/2;
-dcf 		return tree[node] = update(a, b, x, 2*node, l, m) + update(a, b, x, 2*node+1, m+1, r);
-eca 	}
-d1a }
-
-
-\end{lstlisting}
-
-\subsection{SegTree Update}
-\begin{lstlisting}
-// Recursiva sem Lazy Propagation
-// Query: soma do range [a, b]
-// Update: soma x em cada elemento do range [a, b]
-//
-fb1 namespace SegTree {
-34a     int tree[4*MAX];
-052     int n, *v;
-    
-34c     int build(int node=1, int l=0, int r=n-1) {
-4e3         if (l == r) return tree[node] = v[l];
-ee4         int m = (l+r)/2;
-19c         return tree[node] = build(2*node, l, m) + build(2*node+1, m+1, r);
-913     }
-    
-0d8     void build(int n2, int* v2) {
-680         n = n2, v = v2;
-6f2         build();
-acb     }
-       
-a2c     int query(int a, int b, int node=1, int l=0, int r=n-1) {
-786         if (b < l or r < a) return 0;
-e09         if (a <= l and r <= b) return tree[node];
-ee4         int m = (l+r)/2;
-1db         return query(a, b, 2*node, l, m) + query(a, b, 2*node+1, m+1, r);
-09b     }
-        
-eb3     void update(int i, int x, int node=1, int l=0, int r=n-1) {
-893         if (l == r) {
-d6d             tree[node] = x;
-505             return;
-b74         }
-ee4         int m = (l+r)/2;
-3df         if (i <= m) update(i, x, 2*node, l, m);
-0a9         else update(i, x, 2*node+1, m+1, r);
-8fb         tree[node] = tree[2*node] + tree[2*node+1];
-dad     }
-ce6 }
-\end{lstlisting}
-
-\subsection{Sparse Table}
-\begin{lstlisting}
-// Resolve RMQ
-//
-// Complexidades:
-// build - O(n log(n))
-// query - O(1)
-
-cca namespace sparse {
-d28 	int m[LOG+1][MAX], n;
-61c 	void build(int n2, int* v) {
-1e3 		n = n2;
-78e 		for (int i = 0; i < n; i++) m[0][i] = v[i];
-a1c 		for (int j = 1; (1<<j) <= n; j++) for (int i = 0; i+(1<<j) <= n; i++)
-5d5 			m[j][i] = min(m[j-1][i], m[j-1][i+(1<<(j-1))]);
-cae 	}
-4ea 	int query(int a, int b) {
-ee5 		int j = __builtin_clz(1) - __builtin_clz(b-a+1);
-dc3 		return min(m[j][a], m[j][b-(1<<j)+1]);
-fba 	}
-3e1 }
-\end{lstlisting}
-
-
-
-%%%%%%%%%%%%%%%%%%%%
-%
 % Primitivas
 %
 %%%%%%%%%%%%%%%%%%%%
@@ -787,7 +181,10 @@ d94 	ld operator ^ (const point p) const { return x*p.y - y*p.x; }
 b2b 	friend istream& operator >> (istream& in, point& p) {
 e37 		return in >> p.x >> p.y;
 d70 	}
-70a };
+8b0 	friend ostream& operator << (ostream& os, const pt& p) {
+d80 		return os << "(" << p.x << ", " << p.y << ")"; 
+03c 	}
+767 };
 
 b3a struct line { // reta
 b1f 	point p, q;
@@ -943,6 +340,20 @@ e38 		if (eq(p.y, v[i].y) and eq(p.y, v[j].y)) {
 d13 	}
 b84 	return qt != 0;
 1c7 }
+
+603 ld angle(const point &p, const point &ref) { // angulo do ponto p em relacao ao ponto ref
+f5b     point v = p - ref;
+587     ld ang = atan2(v.y, v.x);
+6f8     if (ang < 0) ang += 2*pi;
+19c     return ang;
+220 }
+
+//ordena os pontos de acordo com o angulo
+34e void polarSort(vector<point> &v, point &ref) {
+0f8     sort(v.begin(), v.end(), [&ref](point a, point b) { 
+9dd         return angle(a, ref) < angle(b, ref);
+17a     });
+060 }
 \end{lstlisting}
 
 \subsection{Geometria Int}
@@ -1142,6 +553,1041 @@ eb6 }
  
 \end{lstlisting}
 
+\subsection{ruct matrix : vector<vector<int>> {}
+\begin{lstlisting}
+
+df8     matrix(int n_, int m_, bool ident = false) : vector<vector<int>>(n_, vector<int>(m_, 0)), n(n_), m(m_) {
+94e         if (ident) {
+df7             assert(n == m);
+a89 			for (int i = 0; i < n; i++) (*this)[i][i] = 1;
+359 		}
+456 	}
+
+483     matrix(const vector<vector<int>>& c) : vector<vector<int>>(c),
+a3d     n(c.size()), m(c[0].size()) {}
+
+d01     matrix operator*(const matrix &a) const {
+eda         assert(m == a.n);
+ca0         matrix res(n, a.m);
+603         for (int i = 0; i < n; i++){
+cf4             for (int j = 0; j < a.m; j++){
+917                 for (int k = 0; k < m; k++){
+956                     res[i][j] = (res[i][j] + ((*this)[i][k] * a[k][j]) % MOD) % MOD;
+368                 }
+830             }
+a00         }
+b50         return res;
+3b4     }
+
+3d2     matrix operator^(int e) const {
+cd2         matrix res(n,n,true);
+2de         matrix base = *this;
+c87         while (e) {
+d4a             if (e&1) res = res * base;
+6c1             base = base * base;
+cc2             e >>= 1;
+ece         }
+b50         return res;
+81d     }
+214 };
+\end{lstlisting}
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%
+% Grafo
+%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Grafo}
+
+\subsection{Bridge Tree}
+\begin{lstlisting}
+
+9fa int t, c, low[MAX], pre[MAX], visited[MAX], comp[MAX];
+7b4 stack<int> st;
+375 vector<int> graph[MAX], compgraph[MAX];
+
+955 void dfs(int v, int p){
+cda     visited[v] = 1;
+98b     low[v] = pre[v] = ++t;
+30c     st.emplace(v);
+284     for (auto u : graph[v]){
+264         if (!visited[u]){
+412             dfs(u,v);
+c80             low[v] = min(low[v], low[u]);
+77d         }   
+4e6         else {
+2da             if (u == p) continue;
+39b             low[v] = min(low[v], pre[u]);
+acd         }
+11d     }
+cf1     if (low[v] == pre[v]){ //achamos uma bridge
+6a4         c++;
+2f4         int cur;
+016         do {
+596             cur = st.top();
+25a             st.pop();
+524             comp[cur] = c;
+cca             compgraph[c].push_back(cur);
+583         } while(cur != v);
+b04     }
+6fc }
+\end{lstlisting}
+
+\subsection{Dinitz}
+\begin{lstlisting}
+// O(min(m * max_flow, n^2 m))
+// Grafo com capacidades 1: O(min(m sqrt(m), m * n^(2/3)))
+// Todo vertice tem grau de entrada ou saida 1: O(m sqrt(n))
+
+472 struct dinitz {
+61f 	const bool scaling = false; // com scaling -> O(nm log(MAXCAP)),
+206 	int lim;                    // com constante alta
+670 	struct edge {
+358 		int to, cap, rev, flow;
+7f9 		bool res;
+d36 		edge(int to_, int cap_, int rev_, bool res_)
+a94 			: to(to_), cap(cap_), rev(rev_), flow(0), res(res_) {}
+f70 	};
+    
+002 	vector<vector<edge>> g;
+216 	vector<int> lev, beg;
+a71 	ll F;
+190 	dinitz(int n) : g(n), F(0) {}
+    
+087 	void add(int a, int b, int c) {
+bae 		g[a].emplace_back(b, c, g[b].size(), false);
+4c6 		g[b].emplace_back(a, 0, g[a].size()-1, true);
+5c2 	}
+123 	bool bfs(int s, int t) {
+90f 		lev = vector<int>(g.size(), -1); lev[s] = 0;
+64c 		beg = vector<int>(g.size(), 0);
+8b2 		queue<int> q; q.push(s);
+402 		while (q.size()) {
+be1 			int u = q.front(); q.pop();
+bd9 			for (auto& i : g[u]) {
+dbc 				if (lev[i.to] != -1 or (i.flow == i.cap)) continue;
+b4f 				if (scaling and i.cap - i.flow < lim) continue;
+185 				lev[i.to] = lev[u] + 1;
+8ca 				q.push(i.to);
+f97 			}
+e87 		}
+0de 		return lev[t] != -1;
+742 	}
+036 	int dfs(int v, int t, int f = INF) {
+5b4 		if (!f or v == t) return f;
+88f 		for (int& i = beg[v]; i < g[v].size(); i++) {
+027 			auto& e = g[v][i];
+206 			if (lev[e.to] != lev[v] + 1) continue;
+f8a 			int foi = dfs(e.to, t, min(f, e.cap - e.flow));
+749 			if (!foi) continue;
+3c5 			e.flow += foi, g[e.to][e.rev].flow -= foi;
+45c 			return foi;
+407 		}
+bb3 		return 0;
+2e3 	}
+ff6 	ll max_flow(int s, int t) {
+a86 		for (lim = scaling ? (1<<30) : 1; lim; lim /= 2)
+9d1 			while (bfs(s, t)) while (int ff = dfs(s, t)) F += ff;
+4ff 		return F;
+8b9 	}
+e8c };
+
+// Recupera as arestas do corte s-t
+dbd vector<pair<int, int>> get_cut(dinitz& g, int s, int t) {
+f07 	g.max_flow(s, t);
+68c 	vector<pair<int, int>> cut;
+1b0 	vector<int> vis(g.g.size(), 0), st = {s};
+321 	vis[s] = 1;
+3c6 	while (st.size()) {
+b17 		int u = st.back(); st.pop_back();
+322 		for (auto e : g.g[u]) if (!vis[e.to] and e.flow < e.cap)
+c17 			vis[e.to] = 1, st.push_back(e.to);
+d14 	}
+481 	for (int i = 0; i < g.g.size(); i++) for (auto e : g.g[i])
+9d2 		if (vis[i] and !vis[e.to] and !e.res) cut.emplace_back(i, e.to);
+d1b 	return cut;
+1e8 }
+\end{lstlisting}
+
+\subsection{Djikstra}
+\begin{lstlisting}
+861 int dist[MAX]
+d9c void djikstra(int st){
+fe1     priority_queue<pair<int,int>> pq;
+260     for (int i = 0; i < n; i++)dist[i]=LLONG_MAX;
+d89     dist[st] = 0;
+56c     pq.push({0,st});
+502     while(!pq.empty()){
+115         auto [d, v] = pq.top();
+842         d = -d;
+716         pq.pop();
+dd8         if (d != dist[v]) continue;
+940         for (auto [u,w] : graph[v]){
+ac8             int  novadistancia = d + w;
+bd8             if (novadistancia < dist[u]) {
+d96                 dist[u] = novadistancia;
+030                 pq.push({-novadistancia, u});
+c98             }
+379         }
+133     }
+6f3 }
+\end{lstlisting}
+
+\subsection{DSU }
+\begin{lstlisting}
+d56 struct DSU{
+1a8     int n;
+7d2     vector<int> p, r;
+5c7     void init(int _n){
+8fd         n = _n;
+1c4         p.resize(n);
+7e4         r.resize(n);
+603         for(int i = 0; i < n; i++){
+f13             p[i] = i;
+fd1             r[i] = 0;
+606         }
+55e     }
+    
+57b     int find(int x){
+c8c         return p[x] == x ? x : p[x] = find(p[x]);
+2d3     }
+    
+765     bool unite(int a, int b){
+bca         a = find(a);
+b88         b = find(b);
+5c2         if(a == b) return false;
+dac         if(r[a] == r[b]) r[a]++;
+d1b         if(r[a] > r[b]){
+264             p[b] = a;
+4e6             r[a]++;
+db5         }else{
+84b             p[a] = b;
+f6c             r[b]++;
+c3d         }
+8a6         return true;
+632     }
+31c }
+
+
+d56 struct DSU {
+825 	vector<int> id, sz;
+    
+a56 	DSU(int n) : id(n), sz(n, 1) { iota(id.begin(), id.end(), 0); }
+    
+0cf 	int find(int a) { return a == id[a] ? a : id[a] = find(id[a]); }
+    
+440 	void unite(int a, int b) {
+605 		a = find(a), b = find(b);
+d54 		if (a == b) return;
+956 		if (sz[a] < sz[b]) swap(a, b);
+6d0 		sz[a] += sz[b], id[b] = a;
+ea7 	}
+c1b };
+
+\end{lstlisting}
+
+\subsection{HLD - aresta}
+\begin{lstlisting}
+// SegTree de soma
+// query / update de soma das arestas
+//
+// Complexidades:
+// build - O(n)
+// query_path - O(log^2 (n))
+// update_path - O(log^2 (n))
+// query_subtree - O(log(n))
+// update_subtree - O(log(n))
+
+// namespace SegTree { ... }
+
+a70 namespace HLD {
+af8     vector<pair<int,int>> graph[MAX];
+480     int timer, pos[MAX], sz[MAX], sobe[MAX], ancestor[MAX], h[MAX], v[MAX]; 
+    
+c2a     void build_hld(int node, int p = -1, int f = 1){
+f20         v[pos[node] = timer++] = sobe[node];
+57c         sz[node] = 1;
+50f         for (auto &i : graph[node]){
+dd2             auto [u, w] = i;
+2da             if (u == p) continue;
+828             sobe[u] = w;
+df7             ancestor[u] = node;
+112             h[u] = (i == graph[node][0] ? h[node] : u); 
+b79             build_hld(u, node, f);
+e0e             sz[node] += sz[u];
+    
+996             if (sz[u] > sz[graph[node][0].first] || graph[node][0].first == p){
+8c8                 swap(i, graph[node][0]);
+ee5             }
+2b5         }
+469         if (p*f == -1)build_hld(h[node] = node, -1, timer = 0);
+0a5     }
+    
+1f8     void build(int root = 0){
+451         timer = 0;
+295         build_hld(root);
+cbf         SegTree::build(timer, v);
+517     }
+    
+f04     int query_path(int a, int b){
+2d5         if (a == b) return 0;
+aa1         if (pos[a] < pos[b]) swap(a,b);
+186         if (h[a] == h[b]) return SegTree::query(pos[b] + 1, pos[a]);
+587         return SegTree::query(pos[h[a]], pos[a]) + query_path(ancestor[h[a]], b);
+cd0     }
+    
+920     void update_path(int a, int b, int x){
+d54         if (a == b) return;
+aa1         if (pos[a] < pos[b]) swap(a,b);
+    
+1eb         if (h[a] == h[b]) return (void)SegTree::update(pos[b]+1, pos[a], x);
+046         SegTree::update(pos[h[a]], pos[a], x);
+ab0         update_path(ancestor[h[a]], b, x);
+10e     }
+    
+3e4     int query_subtree(int a){
+b9f         if(sz[a] == 1) return 0;
+f97         return SegTree::query(pos[a]+1, pos[a] + sz[a]-1);
+ce2     }
+    
+acc     void update_subtree(int a, int x){
+a5a         if(sz[a] == 1) return;
+84f         SegTree::update(pos[a]+1, pos[a] + sz[a]-1, x);
+bf2     }
+    
+7be     int lca(int a, int b){
+aa1         if (pos[a] < pos[b]) swap(a,b);
+0f9         return h[a] == h[b] ? b : lca(ancestor[h[a]], b);
+263     }
+b5d     int dist(int a, int b) {
+2d5         if (a == b) return 0;
+aa1         if (pos[a] < pos[b]) swap(a,b);
+30a         if (h[a] == h[b]) return pos[a] - pos[b];
+13e         return pos[a] - pos[h[a]] + 1 + dist(ancestor[h[a]], b);
+58d     }
+16d }
+\end{lstlisting}
+
+\subsection{Kosaraju}
+\begin{lstlisting}
+881 int n, com;
+042 vector<int> g[MAX];
+58d vector<int> gi[MAX];
+981 vector<int> g_scc[MAX]; 
+c5a int vis[MAX];
+ee6 stack<int> S;
+a52 int comp[MAX];
+
+1ca void dfs(int k) {
+59a 	vis[k] = 1;
+7b1 	for (int i = 0; i < g[k].size(); i++)
+8d5 		if (!vis[g[k][i]]) dfs(g[k][i]);
+    
+58f 	S.push(k);
+0a1 }
+
+436 void scc(int k, int c) {
+59a 	vis[k] = 1;
+52c 	comp[k] = c;
+309 	for (int i = 0; i < gi[k].size(); i++)
+bf6 		if (!vis[gi[k][i]]) scc(gi[k][i], c);
+b43 }
+
+db8 void kosaraju() {
+991 	for (int i = 0; i < n; i++) vis[i] = 0;
+    
+158 	for (int i = 0; i < n; i++) if (!vis[i]) dfs(i);
+    
+991 	for (int i = 0; i < n; i++) vis[i] = 0;
+d32 	while (S.size()) {
+70b 		int u = S.top();
+7de 		S.pop();
+1d6 		if (!vis[u]) {
+fd4             com++;
+7d8             scc(u, com);
+35b         }
+96d     }
+f84 }
+
+// funcao para construir o grafo de componentes
+ad1 void build_component_graph() {
+687     for (int u = 0; u < n; u++) {
+4d5         for (int v : g[u]) {
+1ec             if (comp[u] != comp[v]) {
+6d1                 g_scc[comp[u]].push_back(comp[v]);
+5d9             }
+b1e         }
+1fb     }
+        //remove duplicatas
+002     for (int i = 1; i <= com; i++){
+0a2         sort(g_scc[i].begin(), g_scc[i].end());
+1f9         if (g_scc[i].empty())continue;
+4ad         g_scc[i].erase(unique(g_scc[i].begin(), g_scc[i].end()), g_scc[i].end());
+1d4     }
+6b7 }
+\end{lstlisting}
+
+\subsection{LCA Binary Lifting}
+\begin{lstlisting}
+039 int n, ancestor[MAXN][LOG+1], depth[MAXN], visited[MAXN];
+309 vector<vector<int>> graph;
+
+955 void dfs(int v, int p){
+cda     visited[v] = 1;
+d38     ancestor[v][0] = p;
+    
+c64     for (int i = 1; i <= LOG; i++){
+d14         ancestor[v][i] = ancestor[ancestor[v][i-1]][i-1];
+a6e     }
+    
+284     for (auto u : graph[v]){
+264         if (!visited[u]){
+cf4             depth[u] = depth[v]+1;
+412             dfs(u, v);
+813         }
+2a4     }
+f1b }
+
+c5d int lca(int v, int u){
+6ed     if (depth[v] < depth[u]) swap(v,u);
+    
+4f1     for (int i = LOG-1; i >=  0; i--){
+01e         if ((depth[v] - (1<<i)) >= depth[u]){
+ed6             v = ancestor[v][i];
+cc6         } 
+830     }
+    
+d77     if (u == v) return v;
+    
+4f1     for (int i = LOG-1; i >= 0; i--){
+c47         if (ancestor[v][i] != ancestor[u][i]){
+ed6             v = ancestor[v][i];
+fb0             u = ancestor[u][i];
+329         }
+921     }
+6c2     return ancestor[v][0];
+40e }
+
+33e struct LCA {
+        //one indexed shit
+1c4     int n, l, cur;
+47c     vector<vector<int>> adj, up;
+991     vector<int> h, entry;
+8c5     LCA (int n_) {
+e95         n = n_;
+4e0         l = 31 - __builtin_clz(n);
+839         adj.resize(n + 1);
+a71         up.assign(n + 1, vector<int>(l + 1));
+717         h.resize(n + 1); entry.resize(n + 1);
+b59         cur = 0;
+521     }
+50f     void add(int a, int b) {
+fab         adj[a].push_back(b);
+c87         adj[b].push_back(a);
+386     }
+17c     void dfs(int v = 1, int p = 0, int hh = 0) {
+176         entry[v] = cur++;
+4de         up[v][0] = p;
+910         for(int i = 1; i <= l; i++) {
+73a             up[v][i] = up[up[v][i - 1]][i - 1];
+d67         }
+9bc         for(auto u : adj[v]) {
+58d             if(u != p) {
+828                 dfs(u, v, hh + 1);
+d5f             }
+693         }
+3bc         h[v] = hh;
+a4d     }
+7be     int lca(int a, int b) {
+a6b         if(h[a] > h[b]) {
+257             swap(a, b);
+79b         }
+14e         int dff = h[b] - h[a], cnt = 0;
+d84         while(dff) {
+57f             if(dff & 1) {
+5be                 b = up[b][cnt];
+0ce             }
+f65             cnt++;
+5e9             dff >>= 1;
+488         }
+a89         if(a == b) {
+3f5             return a;
+06e         }
+957         for(int i = l; i >= 0; i--) {
+c84             if(up[a][i] != up[b][i]) {
+3f4                 a = up[a][i];
+6c0                 b = up[b][i];
+568             }
+dc1         }
+e6f         return up[a][0];
+cb7     }
+699     int raise(int node, int dist) {
+            //if it returns 0, then it fucked up
+ac9         int cnt = 0;
+efd         while(dist) {
+e3d             if(dist & 1) {
+466                 node = up[node][cnt];
+0ed             }
+f65             cnt++;
+705             dist >>= 1;
+1c0         }
+192         return node;
+887     }
+b5d     int dist(int a, int b) {
+b80         int z = lca(a, b);
+421         return h[a] + h[b] - 2 * h[z];
+0a0     }
+434 };
+\end{lstlisting}
+
+\subsection{LCA Sparse Table}
+\begin{lstlisting}
+/*
+172 Fazer um euler tour na arvore e inserir todas as vezes que visitamos um no
+6e7 Junto disso inserir a depth desse no em outro vetor
+9f5 no final, o intervalo entre a e b sera representado por todos os nos que visitamos no caminho entre a e b
+55b basta pegar o o no com altura minima nesse intervalo
+31f para saber o ponto incial desse intervalo, basta pegar o tin de a e b
+
+6e5 build O(N LOG N)
+8fc query O(1)
+
+b0d posso pensar em otimizar como chamo o lca guardando a ultima vez que o no foi chamado
+c4c */
+
+4f6 int n, timer = 0, tin[MAX], depth[MAX];
+ba0 vector<int> et;
+227 pair<int,int> sp[MAX*2][LOG+1];
+309 vector<vector<int>> graph; //0 indexado
+
+955 void dfs(int v, int p){
+8c5     tin[v] = et.size();
+490     et.push_back(v);
+284     for (auto u : graph[v]){
+58d         if (u!=p){
+cf4             depth[u] = depth[v]+1;
+412             dfs(u,v);
+490             et.push_back(v);
+f82         }
+7ac     }
+6e0 }
+
+07b void buildtable(){
+96d     for (int i = 0; i < (int)et.size(); i++){
+1e7         sp[i][0] = {depth[et[i]], et[i]};
+bcc     }
+2ae     for (int j = 1; j <= LOG; j++){
+538         for (int i = 0; i + (1<<(j-1)) < (int)et.size(); i++){
+d30             sp[i][j] = min (sp[i][j-1], sp[i+(1<<(j-1))][j-1]);
+985         }
+fd8     }
+641 }
+
+2b4 pair<int,int> query (int a, int b){
+bfb     int len =  b - a + 1;
+5e4     int lg = 31 - __builtin_clz(len);
+a57     return min(sp[a][lg], sp[b - (1<<lg) + 1][lg]);
+11c }
+
+7be int lca(int a, int b){
+fb2     if (tin[a] > tin[b]) swap(a,b);
+ce1     return query(tin[a], tin[b]).second;
+940 }
+
+0dd signed main() {
+5d6     winton;
+45f     int q;
+55a     cin >> n >> q;
+c02     graph.resize(n);
+f50     for (int i = 0; i < n-1; i++){
+ba2         int a, b;
+0a8         cin >> a >> b;
+9c7         graph[--a].push_back(--b);
+4c6         graph[b].push_back(a);
+601     }
+564     dfs(0,0);
+df6     buildtable();
+1f4     while(q--){
+ba2         int a, b;
+0a8         cin >> a >> b;
+450         a--;b--;
+092         int mac = lca(a,b);
+389         cout << depth[a] + depth[b] - 2*depth[mac] << endl;
+e88     }
+    
+1e3 }
+\end{lstlisting}
+
+\subsection{Minimum Spanning Tree}
+\begin{lstlisting}
+d56 struct DSU {
+8f3 	vector<int> comp, sz;
+    
+c1b 	DSU(int n) : comp(n), sz(n, 1) {
+f7a 		iota(all(comp), 0);
+576 	}
+    
+151 	int find(int u) {
+dc3 		if (u == comp[u]) return u;
+a07 		return comp[u] = find(comp[u]);
+65f 	}
+    
+8bf 	bool merge(int a, int b) {
+605 		a = find(a), b = find(b);
+5c2 		if (a == b) return false;
+afa 		sz[a] += sz[b];
+ca8 		comp[b] = a;
+8a6 		return true;
+6bc 	}
+33f };
+ 
+63d void solve(){
+14e     int n, m;
+aa3     cin >> n >> m;
+73b     vector<tuple<int,int,int>> edges; 
+370     DSU dsu(n);
+8f8     edges.resize(m);
+dd5        for (int i = 0; i < m; i++){
+684         int a, b, w;
+060         cin >> a >> b >> w;
+0d4         edges[i] = {w,a,b};
+261     }
+5c1     sort(all(edges));
+704     int cost = 0;
+dd5     for(int i = 0; i < m; i++){
+13d         auto [w,u,v] = edges[i];
+d19         if (dsu.merge(u,v)){
+45f             cost += w;
+b64         }
+ce9     }
+16f }
+\end{lstlisting}
+
+\subsection{Pontos de Articulação}
+\begin{lstlisting}
+/*
+a7e Acha os articulation points do grafo
+c4c */
+
+f7d int t, c, low[MAX], pre[MAX], visited[MAX];
+864 vector<int> graph[MAX], ans;
+
+955 void dfs(int v, int p){
+cda     visited[v] = 1;
+98b     low[v] = pre[v] = ++t;
+14e     bool art = false;
+236     int filhos = 0;
+284     for (auto u : graph[v]){
+264         if (!visited[u]){
+701             filhos++;
+412             dfs(u,v);
+c80             low[v] = min(low[v], low[u]);
+    
+b71             if(low[v] >= pre[v]) art = true;
+4d8         }   
+4e6         else {
+2da             if (u == p) continue;
+39b             low[v] = min(low[v], pre[u]);
+acd         }
+f4f     }
+ca1     if (v == 1 && filhos >= 2) ans.push_back(v);
+021     if (v != 1 && art) ans.push_back(v);
+7fd }
+\end{lstlisting}
+
+\subsection{Toposort}
+\begin{lstlisting}
+// Fazer dfs pra pegar o indeg se necessario
+0ad int indeg[MAX];
+
+55b vector<int> order;
+26a queue<int> q;
+
+519 for (int i = 0; i < MAX; i++){
+ac5     if (indeg[i] == 0)q.push(i);
+3fd }
+14d while(!q.empty()){
+69f     int cur = q.front();   
+ba5     order.push_back(cur);
+833     q.pop();
+411     for (auto u : graph[cur]){
+472         indeg[u]--;
+f90         if (indeg[u] == 0)q.push(u);
+014     }
+f6a }
+\end{lstlisting}
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%
+% DP
+%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{DP}
+
+\subsection{Bitmask DP}
+\begin{lstlisting}
+//hamiltonian path
+9a4 const int MAXN = 20;
+2bd const int MAXM = (1<<20)+7;
+3e4 const int MOD = 1e9+7;
+47b vector<int> graph[MAXN];
+50a int dp[MAXN][MAXM];
+1a8 int n; 
+ 
+003 int pd(int v, int mask){
+718 	auto& p = dp[v][mask];
+    	//cout << v+1 << " " << mask << endl;
+6d2 	if(v == n-1){
+    		//cout << v+1 << " " << mask << endl;
+2bf 		return p = (mask ==((1<<n)-1));
+c4a 	}
+     
+631 	if(p != -1) return p;
+     
+1a4 	int ans = 0;
+    	//cout << graph[v].size() << endl;
+284 	for(auto u : graph[v]){
+    		//cout << u+1 << " " << mask << " " << (1<<u) << endl;
+f67 		if(!((mask>>u)&1)){
+c1c 			int newmask = mask | (1 << u);
+0bc 			ans = (ans + pd(u, newmask))%MOD;
+58a 		}
+d75 	}
+46a 	return p = ans;
+b5a }
+
+//iterativo
+199 dp[1][0] = 1;
+51c for (int s = 2; s < 1 << city_num; s++) {
+    	// only consider subsets that have the first city
+ba0 	if ((s & (1 << 0)) == 0) continue;
+    	// also only consider subsets with the last city if it's the full subset
+8fa 	if ((s & (1 << (city_num - 1))) && s != ((1 << city_num) - 1)) continue;
+631 	for (int end = 0; end < city_num; end++) {
+ec6 		if ((s & (1 << end)) == 0) continue;
+    		// the subset that doesn't include the current end
+171 		int prev = s - (1 << end);
+7de 		for (int j : come_from[end]) {
+fc6 			if ((s & (1 << j))) {
+597 				dp[s][end] += dp[prev][j];
+9f8 				dp[s][end] %= MOD;
+7c9 			}
+9be 		}
+9ff 	}
+290 }
+
+//merging subsets O(n^3)
+827 for (int mask = 0; mask < (1 << n); mask++) {
+e0a 	for (int submask = mask; submask != 0; submask = (submask - 1) & mask) {
+982 		int subset = mask ^ submask;
+    		// do whatever you need to do here
+70a 	}
+e71 }
+
+//submasks
+199 dp[1][0] = 1;
+51c for (int s = 2; s < 1 << city_num; s++) {
+    	// only consider subsets that have the first city
+ba0 	if ((s & (1 << 0)) == 0) continue;
+    	// also only consider subsets with the last city if it's the full subset
+8fa 	if ((s & (1 << (city_num - 1))) && s != ((1 << city_num) - 1)) continue;
+631 	for (int end = 0; end < city_num; end++) {
+ec6 		if ((s & (1 << end)) == 0) continue;
+    		// the subset that doesn't include the current end
+171 		int prev = s - (1 << end);
+7de 		for (int j : come_from[end]) {
+fc6 			if ((s & (1 << j))) {
+597 				dp[s][end] += dp[prev][j];
+9f8 				dp[s][end] %= MOD;
+7c9 			}
+9be 		}
+9ff 	}
+290 }
+\end{lstlisting}
+
+\subsection{Digit DP}
+\begin{lstlisting}
+// TEMPLATE 1: RECURSIVA Padrão [0, R] ou [1, R]
+// ==========================================
+730 int dp[20][11][2][2]; // [index][state][tight][ldz]
+
+c3f int pd(int index, int state, int tight, int ldz) {
+2e8     if(index == n) {
+505         return /* condicao base */;
+d0c     }
+        
+890     if (dp[index][state][tight][ldz] != -1) return dp[index][state][tight][ldz];
+    
+c23     int ub = tight ? r[index] - '0' : 9;
+1a4     int ans = 0;
+    
+70b     for (int digit = 0; digit <= ub; digit++) {
+            // if(!ldz && condicao_invalida) continue;
+    
+e16         int new_tight = tight && (digit == ub);
+d3b         int new_ldz = ldz && (digit == 0);
+            
+f1b         int new_state = state; // atualiza seu estado
+    
+cf0         ans += pd(index + 1, new_state, new_tight, new_ldz);
+572     }
+c77     return dp[index][state][tight][ldz] = ans; 
+18b }
+
+// ==========================================
+// TEMPLATE 2: RECURSIVA Range [L, R] Simultâneo
+// ==========================================
+377 int dp[20][11][2][2][2]; // [index][state][above][under][ldz]
+
+d6c int pd(int index, int state, int above, int under, int ldz) {
+817     if(index == n) return /* condicao base */;
+    
+2d4     if (dp[index][state][above][under][ldz] != -1) return dp[index][state][above][under][ldz];
+    
+c62     int ub = above ? r[index] - '0' : 9;
+f28     int lb = under ? l[index] - '0' : 0;
+1a4     int ans = 0;
+    
+369     for (int digit = lb; digit <= ub; digit++) {
+            // if(!ldz && condicao_invalida) continue;
+    
+394         int new_above = above && (digit == ub);
+4ff         int new_under = under && (digit == lb);
+d3b         int new_ldz = ldz && (digit == 0);
+            
+f1b         int new_state = state; // atualiza seu estado
+    
+a39         ans += pd(index + 1, new_state, new_above, new_under, new_ldz);
+510     }
+430     return dp[index][state][above][under][ldz] = ans; 
+f74 }
+
+// ==========================================
+// TEMPLATE 3: ITERATIVA PUSH DP
+// ==========================================
+518 void solve_iterative() {
+730     int dp[20][11][2][2]; // [index][last][tight][ldz]
+4b9     memset(dp, 0, sizeof(dp));
+    
+a87     dp[0][10][1][1] = 1;
+    
+03b     for (int index = 0; index < n; index++) {
+0c8         for (int last = 0; last <= 10; last++) {
+cc3             for (int tight = 0; tight < 2; tight++) {
+35d                 for (int ldz = 0; ldz < 2; ldz++) {
+                        
+dcf                     int ways = dp[index][last][tight][ldz];
+e6d                     if(!ways) continue;
+    
+b57                     int limit = tight ? r[index] - '0' : 9;
+                        
+865                     for (int digit = 0; digit <= limit; digit++) {
+                            
+5c6                         if(!ldz && last == digit) continue;
+    
+14f                         int new_tight = tight && (digit == limit);
+d3b                         int new_ldz = ldz && (digit == 0);
+                            
+ae9                         int next = new_ldz ? 10 : digit;
+    
+b2e                         dp[index+1][next][new_tight][new_ldz] += ways;
+660                     }
+cde                 }
+32b             }
+f27         }
+35b     }
+77e }
+
+
+7d8 int pd(int index, int sum, int above, int under){
+1df     if(index == n) return (sum == 0);
+    
+a73     if (!above && !under && dp[index][sum] != -1) return dp[index][sum];
+    
+c62     int ub = above ? r[index] - '0' : 9;
+f28     int lb = under ? l[index] - '0' : 0;
+1a4     int ans = 0;
+    
+369     for (int digit = lb; digit <= ub; digit++){
+    
+394         int new_above = above && (digit == ub);
+4ff         int new_under = under && (digit == lb);
+            
+f98         int new_sum = (sum * 10 + digit) % M;
+            
+e79         ans = (ans + pd(index + 1, new_sum, new_above, new_under)) % MOD;
+2ff     }
+        
+6aa     if (!above && !under) dp[index][sum] = ans; 
+ba7     return ans;
+bec }
+
+
+//so precisa fazer memset uma vez mas dai precisa fazer padding pra ambos os numeros terem o mesmo numero de digitos
+5db int count(int x){
+d06     s = to_string(x);
+        
+eda     int pad = 19 - s.size();
+a0e     if (pad > 0) s = string(pad, '0') + s;
+        
+25a     n = s.size();
+272     return pd(0,0,1);
+2b8 }
+
+63d void solve(){
+74f     int l, r;
+5a9     cin >> l >> r;
+27a     memset(dp, -1, sizeof(dp));
+aba     cout << count(r) - count(l-1) << endl;
+21c }
+
+/*
+b73 otimizacao super importante
+7ea desse jeito, o digito menos significativo sempre esta na posicao 0
+bb3 entao as posicoes dos digitos de cada numero sempre estarao na mesma posicao
+2c3 por exemplo 1234 e 12
+c6f do jeito normal ficaria 
+81d 1234
+c20   12
+
+47a desse jeito fica
+d93 4321
+3c5   21
+
+4be entao a potencia de 10 em cada posicao e sempre a mesma, permitindo so rodar o memset uma vez 
+c4c */
+990 vector<int> v; 
+7c2 int pd(int index, int tight, int mask, int ldz){
+789     if (index == -1) return ((__bit_width(mask) - 1) == __popcount(mask));
+        
+090     if (!tight && dp[index][mask][ldz] != -1) return dp[index][mask][ldz];
+    
+cce     int ub = tight ? v[index] : 9;
+1a4     int ans = 0;
+a93     int sum = 0;
+    
+70b     for (int digit = 0; digit <= ub; digit++){
+e16         int new_tight = tight && (digit == ub);
+    
+d3b         int new_ldz = ldz && (digit == 0);
+            
+963         int new_mask = mask;
+889         if (!new_ldz) new_mask |= (1 << digit);
+    
+6d6         ans += pd(index - 1, new_tight, new_mask, new_ldz);
+739     }
+    
+0ab     if (!tight) dp[index][mask][ldz] = ans; 
+ba7     return ans;
+1c6 }
+
+a7e int count(ll x){
+848     v.clear();
+f4c     while(x) {
+d6f         v.push_back(x % 10);
+6bd         x /= 10;
+053     }
+    
+            /* [L,R]
+3cd     int count(int x, int y){
+d65     v2.clear();
+f4c     while(x) {
+b64         v2.push_back(x % 10);
+6bd         x /= 10;
+d12     }
+848     v.clear();
+    
+1b8     while(y) {
+da8         v.push_back(y % 10);
+a53         y /= 10;
+38c     }
+de6     while(v2.size() < v.size()) v2.push_back(0LL);
+c4c     */
+       
+d6c     n = v.size();
+726     return pd(n-1,1,0,1);
+6ae }
+    
+63d void solve(){
+bb3     ll r;
+da1     cin >> r;
+226     cout << count(r) << endl;
+c01 }
+    
+0dd signed main(){
+5d6     winton;
+27a     memset(dp, -1, sizeof(dp));
+8bd     int t;
+f1b     cin >> t;
+6e6     while(t--) solve();
+f37 }
+\end{lstlisting}
+
+\subsection{Edit Distance}
+\begin{lstlisting}
+
+ac1 string s, t;
+fee cin >> s >> t;
+3e6 int n = s.length();
+32a int m = t.length();
+78a for (int i = 1; i <= n; i++){
+cbc     for (int j = 1; j <= m; j++){
+c70         if(s[i-1] == t[j-1]) dp[i][j] = 1 + dp[i-1][j-1];
+6d7         else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+9e1     }
+4b0 }
+\end{lstlisting}
+
+\subsection{Knapsack II}
+\begin{lstlisting}
+7d2 int n, W;
+dfd int arr[MAXN], weights[MAXN];
+
+d09 int pd(int i, int val){
+966     if(val < 0) return INF;
+2e2     if(val == 0) return 0;
+847     if(i == 0) return INF;
+    
+e8e     if(dp[i][val] != -1) return dp[i][val];
+    
+31b     return dp[i][val] = min(pd(i-1, val - arr[i]) + weights[i], pd(i-1, val));
+522 }
+\end{lstlisting}
+
+\subsection{Knapsack recursivo}
+\begin{lstlisting}
+
+dca int n, k;
+ede int pd(int w, int i){
+7a7     if(w > k) return -INF;
+12b     if(i == n) return 0;
+260     if(dp[i][w] != -1) return dp[i][w];
+    
+5f3     return dp[i][w] = max(pd(w+peso[i], i+1) + val[i], pd(w, i+1));
+f97 }
+\end{lstlisting}
+
+\subsection{LCS}
+\begin{lstlisting}
+
+ac1 string s, t;
+fee cin >> s >> t;
+3e6 int n = s.length();
+32a int m = t.length();
+78a for (int i = 1; i <= n; i++){
+cbc     for (int j = 1; j <= m; j++){
+c70         if(s[i-1] == t[j-1]) dp[i][j] = 1 + dp[i-1][j-1];
+6d7         else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+9e1     }
+4b0 }
+\end{lstlisting}
+
 
 
 %%%%%%%%%%%%%%%%%%%%
@@ -1151,6 +1597,232 @@ eb6 }
 %%%%%%%%%%%%%%%%%%%%
 
 \section{Problemas}
+
+\subsection{}
+\begin{lstlisting}
+41d inversion pairs before each removal. The number of inversion pairs of an array A is the number of
+a9e ordered pairs (i, j) such that i < j and A[i] > A[j].
+c4c */
+
+2b7 #include <bits/stdc++.h>
+ca4 using namespace std;
+
+613 #define all(x) x.begin(), x.end()
+1c9 #define rall(x) x.rbegin(), x.rend()
+42a #define endl '\n'
+a7f #define int long long
+d40 #define ld long double
+
+7f0 namespace dbg {
+404     const char* const RESET     = "\033[0m";
+646     const char* const BOLD_BLUE = "\033[1;34m";
+d39     const char* const YELLOW    = "\033[33m";
+e1d     const char* const BOLD_WHITE= "\033[1;37m";
+    
+620     template<typename T1, typename T2>
+c1f     ostream& operator<<(ostream& os, const pair<T1, T2>& p);
+    
+876     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
+dab     ostream& operator<<(ostream& os, const T_container& v) {
+b6a         os << '{';
+ce4         bool first = true;
+dbd         for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
+ff7         return os << '}';
+1d7     }
+    
+620     template<typename T1, typename T2>
+598     ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
+    
+3a4     void debug_out(string_view) { cerr << endl; }
+2dc     template<typename H, typename... T>
+dc3     void debug_out(string_view s, H h, T... t) {
+196         auto cpos = s.find(',');
+53e         cerr << YELLOW << s.substr(0, cpos) << RESET << " = ";
+891         cerr << BOLD_WHITE << h << RESET;
+c4a         if constexpr (sizeof...(t) > 0) {
+57b             cerr << ", ";
+1cb             auto nx = s.find_first_not_of(" \t\n\r", cpos + 1);
+937             debug_out(s.substr(nx), t...);
+7eb         } else {
+016             cerr << endl;
+bf4         }
+6ed     }
+b19 } 
+e4e using namespace dbg;
+
+// #define DEBUG
+
+733 #if defined(DEBUG)
+769     #define winton (void)0
+c88     #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
+8c1 #else
+62e     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
+e3e     #define debug(...) (void)0
+f2e #endif
+
+
+a6b template<class T = int> struct bit2d {
+acf 	vector<T> X;
+a84 	vector<vector<T>> Y, t;
+    
+709 	int ub(vector<T>& v, T x) {
+dde 		return upper_bound(v.begin(), v.end(), x) - v.begin();
+9cc 	}
+5cb 	bit2d(vector<pair<T, T>> v) {
+2e1 		for (auto [x, y] : v) X.push_back(x);
+fd4 		sort(X.begin(), X.end());
+1ee 		X.erase(unique(X.begin(), X.end()), X.end());
+    
+d56 		t.resize(X.size() + 1);
+d12 		Y.resize(t.size());
+3d0 		sort(v.begin(), v.end(), [](auto a, auto b) {
+e8f 			return a.second < b.second; });
+961 		for (auto [x, y] : v) for (int i = ub(X, x); i < t.size(); i += i&-i)
+b75 			if (!Y[i].size() or Y[i].back() != y) Y[i].push_back(y);
+    
+7c7 		for (int i = 0; i < t.size(); i++) t[i].resize(Y[i].size() + 1);
+8cc 	}
+    
+e78 	void update(T x, T y, T v) {
+2a9 		for (int i = ub(X, x); i < t.size(); i += i&-i)
+cd2 			for (int j = ub(Y[i], y); j < t[i].size(); j += j&-j) t[i][j] += v;
+533 	}
+    
+5d2 	T query(T x, T y) {
+966 		T ans = 0;
+c54 		for (int i = ub(X, x); i; i -= i&-i)
+4fb 			for (int j = ub(Y[i], y); j; j -= j&-j) ans += t[i][j];
+ba7 		return ans;
+62d 	}
+46d 	T query(T x1, T y1, T x2, T y2) {
+fcf 		return query(x2, y2)-query(x2, y1-1)-query(x1-1, y2)+query(x1-1, y1-1);
+232 	}
+6a7 };
+
+0dd signed main(){
+5d6     winton;
+3b9     int n, q;
+83f     while(cin >> n >> q){
+    
+7ed         vector<int> a(n), pos(n+1);
+a84         vector<pair<int,int>> plano(n);
+603         for (int i = 0; i < n; i++){
+788             cin >> a[i];
+d1d             pos[a[i]] = i+1;
+1b4             plano[i] = {i+1, a[i]};
+df0         }
+            
+9ff         bit2d bit(plano);
+2cb         for (auto [x,y] : plano) bit.update(x,y,1);
+a93         int sum = 0;
+e84         for (auto [x,y] : plano){
+d6b             sum += bit.query(x+1, 1, n, y-1);
+7db         } 
+cde         debug(sum);
+            
+1f4         while(q--){
+                // cout << "sum: " ;
+d94             cout << sum << endl;
+                
+93d             int y;
+e90             cin >> y;
+874             int x = pos[y];
+e04             bit.update(x,y,-1);
+053             sum -= bit.query(1, y+1, x-1, n);
+89a             sum -= bit.query(x+1, 1, n, y-1);
+5b7         }       
+7e6     }
+698 }
+\end{lstlisting}
+
+\subsection{3 equacoes 4 variaveis}
+\begin{lstlisting}
+// e(s) = (y+p-r)/2 - s
+// w(s) = (y-p-r)/2 - s
+// s(s) = s
+ 
+// n(s) = a + s
+// e(s) = b - s
+// w(s) = c - s
+// s(s) = s
+ 
+// M = max{(|a+s|), (|b-s|), (|c-s|), (|s|)}
+ 
+// |a+s| <= M    ->     -M-a <= s <= M-a
+// |b-s| <= M    ->     -M+b <= s <= M+b
+// |c-s| <= M    ->     -M+c <= s <= M+c
+// |s|   <= M    ->     -M   <= s <= M
+ 
+// achar o minimo e maximo do intervalo de s
+ 
+// smin = max(-a,b,c,0)
+// smax = max(-a,b,c,0)
+0dd signed main(){
+45f     int q;
+11b     cin >> q;
+1f4     while(q--){
+172         ld p, r, y;
+b47         cin >> p >> r >> y;
+bf3         ld a = r;
+09e         ld b = (y+p-r)/2;
+305         ld c = (y-p-r)/2;
+     
+c79         ld smin = max({-a,b,c,(ld)0.0});
+34f         ld smax = min({-a,b,c,(ld)0.0});
+     
+e2e         ld s = (smin+smax)/2;
+     
+4cb         ld n = r+s;
+e48         ld e = b-s;
+c2d         ld w = c-s;
+     
+e8a         cout << fixed << setprecision(7) << n << ' ' << e << ' ' << s << ' ' << w << ' ' << endl;
+bb1     }
+cb3 }
+\end{lstlisting}
+
+\subsection{Achar prefixos que formam a string toda}
+\begin{lstlisting}
+ 
+878 mt19937 rng((int) chrono::steady_clock::now().time_since_epoch().count());
+ 
+463 int uniform(int l, int r) {
+a7f 	uniform_int_distribution<int> uid(l, r);
+f54 	return uid(rng);
+d9e }
+ 
+9e0 template<int MOD> struct str_hash {
+c63 	static int P;
+648 	vector<int> h, p;
+ea8 	str_hash(string s) : h(s.size()), p(s.size()) {
+7a2 		p[0] = 1, h[0] = s[0];
+ad7 		for (int i = 1; i < s.size(); i++)
+84c 			p[i] = p[i - 1]*P%MOD, h[i] = (h[i - 1]*P + s[i])%MOD;
+1ef 	}
+6cf 	int operator()(int l, int r) { // retorna hash s[l...r]
+796 		int hash = h[r] - (l ? h[l - 1]*p[r - l + 1]%MOD : 0);
+dfd 		return hash < 0 ? hash + MOD : hash;
+e8b 	}
+6cf };
+217 template<int MOD> int str_hash<MOD>::P = uniform(256, MOD - 1); // l > |sigma|
+ 
+ 
+63d void solve() {
+21a     string s; cin >> s;
+556     str_hash<MOD> hasher(s);
+163     int n = s.size();
+78a     for(int i = 1; i <= n; i++){
+bdd         if(i == n) cout << n << endl;
+4e6         else{
+9f5             int h1 = hasher(0, n-i-1);
+576             int h2 = hasher(i, n-1);
+18b             if(h1 == h2){
+bfe                 cout << i << " ";
+ef7             }
+d8b         }
+e54     }
+fb3 }
+\end{lstlisting}
 
 \subsection{Artwork}
 \begin{lstlisting}
@@ -1489,52 +2161,45 @@ d2a     cout << cnt%MOD << ' ' << sum%MOD << ' ' << prod%MOD << endl;
 a52 }
 \end{lstlisting}
 
-\subsection{Drone Control (3 Equa, 4 Vars)}
+\subsection{Graph Paths I}
 \begin{lstlisting}
-// n(s) = r + s
-// e(s) = (y+p-r)/2 - s
-// w(s) = (y-p-r)/2 - s
-// s(s) = s
- 
-// n(s) = a + s
-// e(s) = b - s
-// w(s) = c - s
-// s(s) = s
- 
-// M = max{(|a+s|), (|b-s|), (|c-s|), (|s|)}
- 
-// |a+s| <= M    ->     -M-a <= s <= M-a
-// |b-s| <= M    ->     -M+b <= s <= M+b
-// |c-s| <= M    ->     -M+c <= s <= M+c
-// |s|   <= M    ->     -M   <= s <= M
- 
-// achar o minimo e maximo do intervalo de s
- 
-// smin = max(-a,b,c,0)
-// smax = max(-a,b,c,0)
-// 
 0dd signed main(){
-45f     int q;
-11b     cin >> q;
-1f4     while(q--){
-172         ld p, r, y;
-b47         cin >> p >> r >> y;
-bf3         ld a = r;
-09e         ld b = (y+p-r)/2;
-305         ld c = (y-p-r)/2;
-     
-c79         ld smin = max({-a,b,c,(ld)0.0});
-34f         ld smax = min({-a,b,c,(ld)0.0});
-     
-e2e         ld s = (smin+smax)/2;
-     
-4cb         ld n = r+s;
-e48         ld e = b-s;
-c2d         ld w = c-s;
-     
-e8a         cout << fixed << setprecision(7) << n << ' ' << e << ' ' << s << ' ' << w << ' ' << endl;
-bb1     }
-cb3 }
+add     int n, m, k;
+5fe     cin >> n >> m >> k;
+70d     vector<vector<int>> con(n, vector<int>(n));
+dd5     for (int i = 0; i < m; i++){
+ba2         int a, b;
+0a8         cin >> a >> b;
+67f         con[--a][--b]++;
+69c     }
+db1     matrix mt(con);
+        
+654     mt = mt^k;
+4aa     cout << mt[0][n-1] << endl;
+c21 }
+\end{lstlisting}
+
+\subsection{Graph Paths I}
+\begin{lstlisting}
+// Minimum path length that visits k vertices
+0dd signed main(){
+add     int n, m, k;
+5fe     cin >> n >> m >> k;
+067     vector<vector<int>> con(n, vector<int>(n, INF));
+dd5     for (int i = 0; i < m; i++){
+70f         int a, b, c;
+e22         cin >> a >> b >> c;
+583         a--;
+199         b--;
+d81         con[a][b] = min(c, con[a][b]);
+946     }
+db1     matrix mt(con);
+654     mt = mt^k; 
+f57     int ans = mt[0][n-1];
+4bc     if (ans == INF) cout << "-1" << endl;
+519     else cout << ans << endl;
+    
+00a }
 \end{lstlisting}
 
 \subsection{Hungaro}
@@ -1669,6 +2334,26 @@ cbb 		sum = max(sum + x[i], x[i]);
 b9a 	return mx;
 df8 }
 
+\end{lstlisting}
+
+\subsection{MissingCoinSUM}
+\begin{lstlisting}
+0dd signed main(){
+a68     cin >> n;
+2b5     for(int i = 0; i < n; i++) cin >> arr[i];
+7a3     sort(arr, arr+n);
+        
+87c     int ans = 1;
+603     for(int i = 0; i < n; i++){
+eff         if(arr[i] > ans){
+886             cout << ans << endl;
+bb3             return 0;
+2b9         }
+e79         ans += arr[i];
+54a     }
+     
+886     cout << ans << endl;
+3ec }
 \end{lstlisting}
 
 \subsection{Number of Pairs (GCD e LCM)}
@@ -2164,6 +2849,544 @@ a7b }
 
 %%%%%%%%%%%%%%%%%%%%
 %
+% Estrutura de Dados
+%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Estrutura de Dados}
+
+\subsection{BIT}
+\begin{lstlisting}
+116     vector<int> bit;
+1a8     int n;
+5c7     void init(int _n){
+8fd         n = _n;
+175         bit.assign(n+1, 0);
+683     }
+
+d15     int sum(int x){
+37f         int s = 0;
+ca3         for(; x > 0; x -= x&(-x)){
+3ef             s += bit[x];
+b24         }
+047         return s;
+e1f     }
+
+57c     void upd(int x, int v){
+529         for(; x <= n; x += x&(-x)){
+175             bit[x] += v;
+5cb         }
+a17     }
+214 };
+    
+8eb struct Bit {
+1a8 	int n;
+116 	vector<int> bit;
+e86 	Bit(int _n = 0) : n(_n), bit(n + 1) {}
+70f 	Bit(vector<int>& v) : n(v.size()), bit(n + 1) {
+78a 		for (int i = 1; i <= n; i++) {
+671 			bit[i] += v[i - 1];
+edf 			int j = i + (i & -i);
+b8a 			if (j <= n) bit[j] += bit[i];
+806 		}
+e89 	}
+cf6 	void update(int i, int x) { // soma x na posicao i
+b64 		for (i++; i <= n; i += i & -i) bit[i] += x;
+850 	}
+
+cdb 	int pref(int i) { // soma [0, i]
+7c9 		int ret = 0;
+4d3 		for (i++; i; i -= i & -i) ret += bit[i];
+edf 		return ret;
+065 	}
+9e3 	int query(int l, int r) {  // soma [l, r]
+89b 		return pref(r) - pref(l - 1); 
+e97 	}
+0ee };
+\end{lstlisting}
+
+\subsection{BIT}
+\begin{lstlisting}
+// BIT de xor 1-based
+// faz o xor no intervalo
+//
+// Complexidades:
+// build - O(n)
+// update - O(log(n))
+// query - O(log(n))
+ 
+8eb struct Bit {
+1a8 	int n;
+116 	vector<int> bit;
+e86 	Bit(int _n=0) : n(_n), bit(n + 1) {}
+cf6 	void update(int i, int x) { // xor x na posicao i
+f0e 		for (i; i <= n; i += i & -i) bit[i] ^= x;
+2a0 	}
+cdb 	int pref(int i) { // xor [0, i]
+7c9 		int ret = 0;
+653 		for (i; i; i -= i & -i) ret ^= bit[i];
+edf 		return ret;
+7d1 	}
+9e3 	int query(int l, int r) {  // xor [l, r]
+da4         debug(pref(r), pref(l-1));
+872 		return pref(r) ^ pref(l - 1); 
+10d 	}
+3d4 };
+\end{lstlisting}
+
+\subsection{Order Statistic Tree}
+\begin{lstlisting}
+//find_by_order(k): similar to find, returns the iterator corresponding 
+//to the k-th lowest element in the set (0-indexed).
+//pode dar insert, erase, size e empty
+
+774 #include <ext/pb_ds/assoc_container.hpp>
+ca4 using namespace std;
+0d7 using namespace __gnu_pbds;
+
+4fc template <class T>
+3eb using Tree =
+2d0     tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+//Tree<int> t;
+//Tree<pair<int, int>> t;
+\end{lstlisting}
+
+\subsection{SegTree Add}
+\begin{lstlisting}
+//Get o caminho 
+
+7e4 tree[4*MAX];
+
+037 void build(int node, int l, int r){
+893     if (l == r){
+c91         tree[node] = 0;//alguma coisa
+505         return;
+447     }
+ee4     int m = (l+r)/2;
+435     build(node*2, l, m);
+4c9     build(node*2+1, m+1, r);
+452 }
+
+10d int get(int node, int l, int r, int i){
+a15     if (l == r) return tree[node];
+ee4     int m = (l+r)/2;
+7c4     int res;
+979     if (i > m) res = get(node*2+1, m+1, r, i);
+d04     else res = get(node*2, l, m, i); 
+eac     return res + tree[node];
+ca6 }
+
+506 void add(int node, int l, int r, int a, int b, int x){
+1dd     if(b < l or r < a) return;
+02b     if(a <= l && r <= b){
+3c6         tree[node] += x;
+505         return;
+5cc     }
+ee4     int m = (l+r)/2;
+3da     add(2*node, l, m, a, b, x);
+307     add(2*node+1, m+1, r, a, b, x);
+616 }
+
+5ed add(1,0,n-1, l, r, value)
+1e7 get(1,0,n-1, index_of_search)
+\end{lstlisting}
+
+\subsection{SegTree Bits}
+\begin{lstlisting}
+// v[i] = -1 => posicao invalida (nao conta)
+// v[i] = 0  => desligado
+// v[i] = 1  => ligado
+//
+// build(n2, v2)
+// query(a,b)        -> 1's em [a,b]
+// update(a,b)       -> flip em [a,b]
+// range_set(a,b,x)  -> seta intervalo [a,b] para x (0/1)
+// point_set(i, x)   -> seta posicao i para -1/0/1
+
+fd2 namespace SegTreeBits {
+34a     int tree[4*MAX];       // 1's no intervalo
+692     int valid[4*MAX];      // posicoes validas no intervalo
+7b3     int lazy_set[4*MAX];   // -1 = nenhum, 0 ou 1 = set pendente
+882     int lazy_flip[4*MAX];  // 0/1: flip pendente
+052     int n, *v;
+    
+34c     int build(int node = 1, int l = 0, int r = n-1) {
+a7d         lazy_set[node] = -1;
+8f7         lazy_flip[node] = 0;
+893         if (l == r) {
+edb             if (v[l] == -1) {
+600                 valid[node] = 0;
+c91                 tree[node] = 0;
+af5             } else {
+a5b                 valid[node] = 1;
+efa                 tree[node] = v[l];
+11d             }
+14d             return tree[node];
+d51         }
+ee4         int m = (l + r)/2;
+d58         build(2*node, l, m);
+537         build(2*node+1, m+1, r);
+d5f         valid[node] = valid[2*node] + valid[2*node+1];
+b00         return tree[node] = tree[2*node] + tree[2*node+1];
+1dc     }
+    
+0d8     void build(int n2, int* v2) {
+b77         n = n2; v = v2;
+6f2         build();
+b56     }
+    
+95b     inline void apply_set(int node, int l, int r, int x) {
+c81         tree[node] = valid[node] * x;
+219         lazy_set[node] = x;
+8f7         lazy_flip[node] = 0;
+242     }
+    
+fa1     inline void apply_flip(int node, int l, int r) {
+06b         tree[node] = valid[node] - tree[node];
+c30         if (lazy_set[node] != -1) {
+d5b             lazy_set[node] ^= 1;
+6f5         } else {
+e4d             lazy_flip[node] ^= 1;
+0af         }
+1b7     }
+    
+dd7     void prop(int node, int l, int r) {
+8ce         if (l == r) return;
+ee4         int m = (l + r)/2;
+c30         if (lazy_set[node] != -1) {
+d22             apply_set(2*node, l, m, lazy_set[node]);
+43a             apply_set(2*node+1, m+1, r, lazy_set[node]);
+a7d             lazy_set[node] = -1;
+15e         }
+533         if (lazy_flip[node]) {
+fb9             apply_flip(2*node, l, m);
+d12             apply_flip(2*node+1, m+1, r);
+8f7             lazy_flip[node] = 0;
+9b9         }
+e8b     }
+    
+a2c     int query(int a, int b, int node = 1, int l = 0, int r = n-1) {
+d5e         if (b < l || r < a) return 0;
+675         if (a <= l && r <= b) return tree[node];
+020         prop(node, l, r);
+ee4         int m = (l + r)/2;
+1db         return query(a, b, 2*node, l, m) + query(a, b, 2*node+1, m+1, r);
+05e     }
+    
+2be     int update(int a, int b, int node = 1, int l = 0, int r = n-1) {
+199         if (b < l || r < a) return tree[node];
+02b         if (a <= l && r <= b) {
+fd1             apply_flip(node, l, r);
+14d             return tree[node];
+694         }
+020         prop(node, l, r);
+ee4         int m = (l + r)/2;
+2e4         return tree[node] = update(a, b, 2*node, l, m) + update(a, b, 2*node+1, m+1, r);
+4dd     }
+    
+1fd     int range_set(int a, int b, int x, int node = 1, int l = 0, int r = n-1) {
+199         if (b < l || r < a) return tree[node];
+02b         if (a <= l && r <= b) {
+98a             apply_set(node, l, r, x);
+14d             return tree[node];
+8dc         }
+020         prop(node, l, r);
+ee4         int m = (l + r)/2;
+376         return tree[node] = range_set(a, b, x, 2*node, l, m) + range_set(a, b, x, 2*node+1, m+1, r);
+ea9     }
+    
+22d     int point_set(int idx, int val, int node = 1, int l = 0, int r = n-1) {
+893         if (l == r) {
+a7d             lazy_set[node] = -1;
+8f7             lazy_flip[node] = 0;
+08c             if (val == -1) {
+600                 valid[node] = 0;
+c91                 tree[node] = 0;
+3ca             } else {
+a5b                 valid[node] = 1;
+a24                 tree[node] = val;
+d3e             }
+14d             return tree[node];
+718         }
+020         prop(node, l, r);
+ee4         int m = (l + r)/2;
+dbc         if (idx <= m) point_set(idx, val, 2*node, l, m);
+cac         else point_set(idx, val, 2*node+1, m+1, r);
+d5f         valid[node] = valid[2*node] + valid[2*node+1];
+b00         return tree[node] = tree[2*node] + tree[2*node+1];
+63c     }
+b96 }
+\end{lstlisting}
+
+\subsection{SegTree Iterativa}
+\begin{lstlisting}
+fb1 namespace SegTree {
+1a8     int n;
+8f8     int pot2;
+562     vector<int> tree;
+    
+0d8     void build(int n2, int* v2) {
+1e3         n = n2;
+fa5         pot2 = 1;
+2c6         while (pot2 < n) pot2 <<= 1;
+26a         tree.assign(2 * pot2, 0);
+4e2         for (int i = 0; i < n; ++i) tree[pot2 + i] = v2[i];
+813         for (int i = pot2 - 1; i >= 1; --i) tree[i] = max(tree[2*i], tree[2*i+1]);
+641     }
+    
+4ea     int query(int a, int b) {
+026         if (a > b) return 0;
+238         a += pot2; b += pot2;
+11e         int res = 0;
+cce         while (a <= b) {
+16c             if (a & 1) res = max(res, tree[a++]);
+410             if (!(b & 1)) res = max(res, tree[b--]);
+691             a >>= 1; b >>= 1;
+80e         }
+b50         return res;
+d03     }
+    
+cf6     void update(int i, int x) {
+1a7         int p = i + pot2;
+3bc         tree[p] = x;
+8b8         p >>= 1;
+f77         while (p >= 1) {
+280             tree[p] = max(tree[2*p], tree[2*p+1]);
+8b8             p >>= 1;
+6f4         }
+4ad     }
+092 }
+\end{lstlisting}
+
+\subsection{SegTree Lazy}
+\begin{lstlisting}
+// Recursiva com Lazy Propagation
+// Query: soma do range [a, b]
+// Update: soma x em cada elemento do range [a, b]
+//
+// Complexidades:
+// build - O(n)
+// query - O(log(n))
+// update - O(log(n))
+//
+// build (n, vector)
+// query (int a, int b)
+// update (int a, int b, int x)
+// se for de multiplicacao mudar o lazy pra 1 e tirar o lazy * (r-l+1)
+
+fb1 namespace SegTree {
+d18 	int tree[4*MAX], lazy[4*MAX];
+052 	int n, *v;
+    
+34c 	int build(int node=1, int l=0, int r=n-1) {
+131 		lazy[node] = 0;
+4e3 		if (l == r) return tree[node] = v[l];
+ee4 		int m = (l+r)/2;
+19c 		return tree[node] = build(2*node, l, m) + build(2*node+1, m+1, r);
+851 	}
+0d8 	void build(int n2, int* v2) {
+680 		n = n2, v = v2;
+6f2 		build();
+acb 	}
+dd7 	void prop(int node, int l, int r) {
+7eb 		tree[node] += lazy[node]*(r-l+1);
+17c 		if (l != r) lazy[2*node] += lazy[node], lazy[2*node+1] += lazy[node];
+131 		lazy[node] = 0;
+6eb 	}
+a2c 	int query(int a, int b, int node=1, int l=0, int r=n-1) {
+020 		prop(node, l, r);
+e09 		if (a <= l and r <= b) return tree[node];
+786 		if (b < l or r < a) return 0;
+ee4 		int m = (l+r)/2;
+1db 		return query(a, b, 2*node, l, m) + query(a, b, 2*node+1, m+1, r);
+cf9 	}
+c96 	int update(int a, int b, int x, int node=1, int l=0, int r=n-1) {
+020 		prop(node, l, r);
+9a3 		if (a <= l and r <= b) {
+3bd 			lazy[node] += x;
+020 			prop(node, l, r);
+14d 			return tree[node];
+57d 		}
+ad9 		if (b < l or r < a) return tree[node];
+ee4 		int m = (l+r)/2;
+dcf 		return tree[node] = update(a, b, x, 2*node, l, m) + update(a, b, x, 2*node+1, m+1, r);
+eca 	}
+d1a }
+
+
+//struct
+383 struct SegTree {
+d18     int tree[4*MAX], lazy[4*MAX];
+1a8     int n;
+    
+037     void build(int node, int l, int r) {
+131         lazy[node] = 0;
+c91         tree[node] = 0;
+8ce         if (l == r) return;
+ee4         int m = (l+r)/2;
+d58         build(2*node, l, m);
+537         build(2*node+1, m+1, r);
+bb1     }
+    
+5c7     void init(int _n) {
+8fd         n = _n;
+224         build(1, 0, n-1);
+2e4     }
+    
+dd7     void prop(int node, int l, int r) {
+996         if (lazy[node]) {
+3d0             tree[node] = lazy[node];
+579             if (l != r) {
+479                 lazy[2*node] = lazy[node];
+8d6                 lazy[2*node+1] = lazy[node];
+98e             }
+131             lazy[node] = 0;
+9c8         }
+f1d     }
+    
+7b9     void update(int a, int b, int x, int node=1, int l=0, int r=MAX-1) {
+967         if (node == 1) r = n-1;
+020         prop(node, l, r);
+656         if (a > r || b < l) return;
+02b         if (a <= l && r <= b) {
+12e             lazy[node] = x;
+020             prop(node, l, r);
+505             return;
+34c         }
+ee4         int m = (l+r)/2;
+c7a         update(a, b, x, 2*node, l, m);
+d1f         update(a, b, x, 2*node+1, m+1, r);
+7cf         tree[node] = max(tree[2*node], tree[2*node+1]);
+20d     }
+    
+2e7     int query(int a, int b, int node=1, int l=0, int r=MAX-1) {
+967         if (node == 1) r = n-1;
+020         prop(node, l, r);
+d9e         if (a > r || b < l) return 0;
+675         if (a <= l && r <= b) return tree[node];
+ee4         int m = (l+r)/2;
+1e7         return max(query(a, b, 2*node, l, m), query(a, b, 2*node+1, m+1, r));
+c35     }
+5df };
+\end{lstlisting}
+
+\subsection{SegTree Update}
+\begin{lstlisting}
+// Recursiva sem Lazy Propagation
+// Query: soma do range [a, b]
+// Update: soma x em cada elemento do range [a, b]
+//
+fb1 namespace SegTree {
+34a     int tree[4*MAX];
+052     int n, *v;
+    
+34c     int build(int node=1, int l=0, int r=n-1) {
+4e3         if (l == r) return tree[node] = v[l];
+ee4         int m = (l+r)/2;
+19c         return tree[node] = build(2*node, l, m) + build(2*node+1, m+1, r);
+913     }
+    
+0d8     void build(int n2, int* v2) {
+680         n = n2, v = v2;
+6f2         build();
+acb     }
+       
+a2c     int query(int a, int b, int node=1, int l=0, int r=n-1) {
+786         if (b < l or r < a) return 0;
+e09         if (a <= l and r <= b) return tree[node];
+ee4         int m = (l+r)/2;
+1db         return query(a, b, 2*node, l, m) + query(a, b, 2*node+1, m+1, r);
+09b     }
+        
+eb3     void update(int i, int x, int node=1, int l=0, int r=n-1) {
+893         if (l == r) {
+d6d             tree[node] = x;
+505             return;
+b74         }
+ee4         int m = (l+r)/2;
+3df         if (i <= m) update(i, x, 2*node, l, m);
+0a9         else update(i, x, 2*node+1, m+1, r);
+8fb         tree[node] = tree[2*node] + tree[2*node+1];
+dad     }
+ce6 }
+\end{lstlisting}
+
+\subsection{Sparse Table}
+\begin{lstlisting}
+// Resolve RMQ
+//
+// Complexidades:
+// build - O(n log(n))
+// query - O(1)
+
+cca namespace sparse {
+d28 	int m[LOG+1][MAX], n;
+61c 	void build(int n2, int* v) {
+1e3 		n = n2;
+78e 		for (int i = 0; i < n; i++) m[0][i] = v[i];
+a1c 		for (int j = 1; (1<<j) <= n; j++) for (int i = 0; i+(1<<j) <= n; i++)
+5d5 			m[j][i] = min(m[j-1][i], m[j-1][i+(1<<(j-1))]);
+cae 	}
+4ea 	int query(int a, int b) {
+ee5 		int j = __builtin_clz(1) - __builtin_clz(b-a+1);
+dc3 		return min(m[j][a], m[j][b-(1<<j)+1]);
+fba 	}
+3e1 }
+
+67a template <typename T>
+7e9 struct SparseTable {
+5a6 	vector<vector<T>> m;
+    	
+407 	SparseTable(vector<T>& v) {
+3d2 		int n = v.size();
+a12 		int max_log = 32 - __builtin_clz(n);
+d47 		m.assign(max_log, vector<T>(n));
+78e 		for (int i = 0; i < n; i++) m[0][i] = v[i];
+0de 		for (int j = 1; j < max_log; j++) {
+ed9 			for (int i = 0; i + (1<<j) <= n; i++) {
+5d5 				m[j][i] = min(m[j-1][i], m[j-1][i+(1<<(j-1))]);
+642 			}
+a87 		}
+319 	}
+    	
+0ad 	T query(int a, int b) {
+ee5 		int j = __builtin_clz(1) - __builtin_clz(b-a+1);
+dc3 		return min(m[j][a], m[j][b-(1<<j)+1]);
+c89 	}
+4a5 };
+
+// Sparse Table para Bitmasks
+// Utiliza OR bit a bit (|) para combinar conjuntos ou atributos de um intervalo.
+// Muito util para problemas com restricoes pequenas (ex: K <= 64), permitindo
+// substituir K Sparse Tables por apenas 1 (ex: usando unsigned long long).
+67a template <typename T>
+0ff struct SparseTableMask {
+5a6 	vector<vector<T>> m;
+    	
+b3e 	SparseTableMask(vector<T>& v) {
+3d2 		int n = v.size();
+a12 		int max_log = 32 - __builtin_clz(n);
+d47 		m.assign(max_log, vector<T>(n));
+78e 		for (int i = 0; i < n; i++) m[0][i] = v[i];
+0de 		for (int j = 1; j < max_log; j++) {
+ed9 			for (int i = 0; i + (1<<j) <= n; i++) {
+f66 				m[j][i] = (m[j-1][i] | m[j-1][i+(1<<(j-1))]);
+776 			}
+e71 		}
+7f1 	}
+    	
+0ad 	T query(int a, int b) {
+ee5 		int j = __builtin_clz(1) - __builtin_clz(b-a+1);
+8df 		return (m[j][a] | m[j][b-(1<<j)+1]);
+7ed 	}
+991 };
+\end{lstlisting}
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%
 % Matemática
 %
 %%%%%%%%%%%%%%%%%%%%
@@ -2173,21 +3396,40 @@ a7b }
 \subsection{Combinatoria}
 \begin{lstlisting}
 3e4 const int MOD = 1e9+7;
+4e9 const int MOD = 998244353;
+
+183 const int MAX = 1e6+7;
+
+e4a int fat[MAX], invfat[MAX];
 
 bf9 int fastExpo(int base, int exp) {
 c92     int res = 1;
-479     base %= MOD;
-39a     while (exp > 0) {
-dea         if (exp % 2 == 1) res = (res * base) % MOD;
-aa5         base = (base * base) % MOD;
-727         exp /= 2;
-1e2     }
-b50     return res;
-ab3 }
+fb9     while(exp) {
+8ca         if (exp & 1) res = res * base % MOD;
+a6a         base = base * base % MOD;
+ef0         exp >>= 1;
+635     }
+542     return res%MOD;
+2e3 }
 
-c22 int modInverse(int n) {
+868 int modinv(int n) {
 562     return fastExpo(n, MOD - 2);
-c4f }
+92e }
+
+e9d int modiv(int a, int b) {
+a7c     return (a * modinv(b)) % MOD;
+a02 }
+
+0a8 void build(){
+557     fat[0] = 1;
+38a     for (int i = 1; i < MAX; i++) fat[i] = (fat[i-1] * i) % MOD;
+507     invfat[MAX-1] = modinv(fat[MAX-1]);
+e92     for (int i = MAX - 2; i >= 0; i--) invfat[i] = (invfat[i+1] * (i+1)) % MOD;
+4fa }
+c52 int comb(int a, int b){
+a75     if (b > a || b < 0 || a < 0) return 0;
+97d     return (((fat[a] * invfat[b]) % MOD) * invfat[a-b]) % MOD;
+395 }
 
 76f int combinations(int n, int k) {
         // Basic edge cases
@@ -2208,27 +3450,47 @@ b50     return res;
 ff6 }
 
 34a int combinations_mod(int n, int k) {
-032     if (k < 0 || k > n) {
-bb3         return 0;
-edf     }
-b62     if (k == 0 || k == n) {
-6a5         return 1;
-f14     }
-c44     if (k > n / 2) {
-1b5         k = n - k;
-b06     }
+e29     if (k < 0 || k > n)  return 0;
+bbe     if (k == 0 || k == n) return 1;
+63f     if (k > n / 2) k = n - k;
 bd9     int numerator = 1;
-b3d     for(int i = 0; i < k; i++) {
-f70         numerator = (numerator * (n - i)) % MOD;
-020     }
-    
+599     for(int i = 0; i < k; i++) numerator = (numerator * (n - i)) % MOD;
 cd4     int denominator = 1;
-db5     for(int i = 1; i <= k; i++) {
-060         denominator = (denominator * i) % MOD;
-1de     }
-    
-37d     return (numerator * modInverse(denominator)) % MOD;
-1e8 }
+e49     for(int i = 1; i <= k; i++) denominator = (denominator * i) % MOD;
+931     return (numerator * modinv(denominator)) % MOD;
+623 }
+\end{lstlisting}
+
+\subsection{Cramer}
+\begin{lstlisting}
+//Calcula x e y de um sistema linear com 2 equacoes e 2 variaveis
+/*
+253 c1 * x + c2 * y = n
+4fa c3 * x + c4 * y = m
+
+c6d c = coeficientes
+
+82a 5x + 3y = 35
+368 2x - 8y = 12
+c4c */
+
+803 int det = (c1 * c4) - (c2 * c3);
+2e5 int det_x = (n * c4) - (c2 * m);
+ec2 int det_y = (c1 * m) - (n * c3);
+
+143 int x = det_x / det;
+b7f int y = det_y / det;
+
+//mudar pra double e checar se det != 0
+\end{lstlisting}
+
+\subsection{Divisores}
+\begin{lstlisting}
+5f1 for (int i = 1; i * i <= tot; ++i) {
+b32 if (tot % i == 0) {
+025     divisors.push_back(i);
+d73     if (i * i != tot) divisors.push_back(tot / i);
+7b3 }
 \end{lstlisting}
 
 \subsection{EV Máximo}
@@ -2256,6 +3518,9 @@ ef0         exp >>= 1;
 635     }
 542     return res%MOD;
 2e3 }
+e9d int modiv(int a, int b){
+659     return (((a % MOD )* (fastExpo(b, MOD-2) % MOD)) % MOD);
+e50 }
 
 bf9 int fastExpo(int base, int exp) {
 c92     int res = 1;
@@ -2287,6 +3552,7 @@ ef0         exp >>= 1;
 319     }
 b50     return res;
 b1b }
+
 \end{lstlisting}
 
 \subsection{Fatoração Prima}
@@ -2443,482 +3709,301 @@ d85 }
 
 %%%%%%%%%%%%%%%%%%%%
 %
-% DP
+% Strings
 %
 %%%%%%%%%%%%%%%%%%%%
 
-\section{DP}
+\section{Strings}
 
-\subsection{Edit Distance}
+\subsection{implementacao do cp-algorithms}
 \begin{lstlisting}
-
-ac1 string s, t;
-fee cin >> s >> t;
-3e6 int n = s.length();
-32a int m = t.length();
-78a for (int i = 1; i <= n; i++){
-cbc     for (int j = 1; j <= m; j++){
-c70         if(s[i-1] == t[j-1]) dp[i][j] = 1 + dp[i-1][j-1];
-6d7         else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
-9e1     }
-4b0 }
+737     int n = (int)s.length();
+d93     vector<int> pi(n);
+6f5     for (int i = 1; i < n; i++) {
+3f8         int j = pi[i-1];
+a2c         while (j > 0 && s[i] != s[j])
+25c             j = pi[j-1];
+f36         if (s[i] == s[j])
+04b             j++;
+d2e         pi[i] = j;
+a4e     }
+81d     return pi;
+cbb }
+    
+    //implementacao minha
+6cc vector<int> kmp(string s){
+357     int n = s.size(), pfxlen = 0;
+ca9     vector<int> a(n, 0);
+6f5     for (int i = 1; i < n; i++){
+e60         if (s[i] == s[pfxlen]) a[i] = ++pfxlen;
+7f3         else if (pfxlen){
+6b3             pfxlen = a[pfxlen-1];
+169             i--;
+4de         }
+409         else a[i] = 0;
+535     }
+3f5     return a;
+836 }
 \end{lstlisting}
 
-\subsection{LCS}
-\begin{lstlisting}
-
-ac1 string s, t;
-fee cin >> s >> t;
-3e6 int n = s.length();
-32a int m = t.length();
-78a for (int i = 1; i <= n; i++){
-cbc     for (int j = 1; j <= m; j++){
-c70         if(s[i-1] == t[j-1]) dp[i][j] = 1 + dp[i-1][j-1];
-6d7         else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
-9e1     }
-4b0 }
-\end{lstlisting}
-
-
-
-%%%%%%%%%%%%%%%%%%%%
-%
-% Grafo
-%
-%%%%%%%%%%%%%%%%%%%%
-
-\section{Grafo}
-
-\subsection{Bridge Tree}
-\begin{lstlisting}
-
-9fa int t, c, low[MAX], pre[MAX], visited[MAX], comp[MAX];
-7b4 stack<int> st;
-375 vector<int> graph[MAX], compgraph[MAX];
-
-955 void dfs(int v, int p){
-cda     visited[v] = 1;
-98b     low[v] = pre[v] = ++t;
-30c     st.emplace(v);
-284     for (auto u : graph[v]){
-264         if (!visited[u]){
-412             dfs(u,v);
-c80             low[v] = min(low[v], low[u]);
-77d         }   
-4e6         else {
-2da             if (u == p) continue;
-39b             low[v] = min(low[v], pre[u]);
-acd         }
-11d     }
-cf1     if (low[v] == pre[v]){ //achamos uma bridge
-6a4         c++;
-2f4         int cur;
-016         do {
-596             cur = st.top();
-25a             st.pop();
-524             comp[cur] = c;
-cca             compgraph[c].push_back(cur);
-583         } while(cur != v);
-b04     }
-6fc }
-\end{lstlisting}
-
-\subsection{Djikstra}
-\begin{lstlisting}
-861 int dist[MAX]
-d9c void djikstra(int st){
-fe1     priority_queue<pair<int,int>> pq;
-260     for (int i = 0; i < n; i++)dist[i]=LLONG_MAX;
-d89     dist[st] = 0;
-56c     pq.push({0,st});
-502     while(!pq.empty()){
-115         auto [d, v] = pq.top();
-842         d = -d;
-716         pq.pop();
-dd8         if (d != dist[v]) continue;
-940         for (auto [u,w] : graph[v]){
-ac8             int  novadistancia = d + w;
-bd8             if (novadistancia < dist[u]) {
-d96                 dist[u] = novadistancia;
-030                 pq.push({-novadistancia, u});
-c98             }
-379         }
-133     }
-6f3 }
-\end{lstlisting}
-
-\subsection{DSU }
-\begin{lstlisting}
-d56 struct DSU {
-8f3 	vector<int> comp, sz;
-c1b 	DSU(int n) : comp(n), sz(n, 1) {
-f7a 		iota(all(comp), 0);
-576 	}
-151 	int find(int u) {
-dc3 		if (u == comp[u]) return u;
-a07 		return comp[u] = find(comp[u]);
-65f 	}
-c3b 	void merge(int a, int b) {
-605 		a = find(a), b = find(b);
-5c2 		if (a == b) return false;
-afa 		sz[a] += sz[b];
-ca8 		comp[b] = a;
-8a6 		return true;
-2a4 	}
-971 };
-\end{lstlisting}
-
-\subsection{HLD - aresta}
-\begin{lstlisting}
-// SegTree de soma
-// query / update de soma das arestas
-//
-// Complexidades:
-// build - O(n)
-// query_path - O(log^2 (n))
-// update_path - O(log^2 (n))
-// query_subtree - O(log(n))
-// update_subtree - O(log(n))
-
-// namespace SegTree { ... }
-
-a70 namespace HLD {
-af8     vector<pair<int,int>> graph[MAX];
-480     int timer, pos[MAX], sz[MAX], sobe[MAX], ancestor[MAX], h[MAX], v[MAX]; 
-    
-c2a     void build_hld(int node, int p = -1, int f = 1){
-f20         v[pos[node] = timer++] = sobe[node];
-57c         sz[node] = 1;
-50f         for (auto &i : graph[node]){
-dd2             auto [u, w] = i;
-2da             if (u == p) continue;
-828             sobe[u] = w;
-df7             ancestor[u] = node;
-112             h[u] = (i == graph[node][0] ? h[node] : u); 
-b79             build_hld(u, node, f);
-e0e             sz[node] += sz[u];
-    
-996             if (sz[u] > sz[graph[node][0].first] || graph[node][0].first == p){
-8c8                 swap(i, graph[node][0]);
-ee5             }
-2b5         }
-469         if (p*f == -1)build_hld(h[node] = node, -1, timer = 0);
-0a5     }
-    
-1f8     void build(int root = 0){
-451         timer = 0;
-295         build_hld(root);
-cbf         SegTree::build(timer, v);
-517     }
-    
-f04     int query_path(int a, int b){
-2d5         if (a == b) return 0;
-aa1         if (pos[a] < pos[b]) swap(a,b);
-186         if (h[a] == h[b]) return SegTree::query(pos[b] + 1, pos[a]);
-587         return SegTree::query(pos[h[a]], pos[a]) + query_path(ancestor[h[a]], b);
-cd0     }
-    
-920     void update_path(int a, int b, int x){
-d54         if (a == b) return;
-aa1         if (pos[a] < pos[b]) swap(a,b);
-    
-1eb         if (h[a] == h[b]) return (void)SegTree::update(pos[b]+1, pos[a], x);
-046         SegTree::update(pos[h[a]], pos[a], x);
-ab0         update_path(ancestor[h[a]], b, x);
-10e     }
-    
-3e4     int query_subtree(int a){
-b9f         if(sz[a] == 1) return 0;
-f97         return SegTree::query(pos[a]+1, pos[a] + sz[a]-1);
-ce2     }
-    
-acc     void update_subtree(int a, int x){
-a5a         if(sz[a] == 1) return;
-84f         SegTree::update(pos[a]+1, pos[a] + sz[a]-1, x);
-bf2     }
-    
-7be     int lca(int a, int b){
-aa1         if (pos[a] < pos[b]) swap(a,b);
-0f9         return h[a] == h[b] ? b : lca(ancestor[h[a]], b);
-263     }
-ea8 }
-\end{lstlisting}
-
-\subsection{Kosaraju}
-\begin{lstlisting}
-881 int n, com;
-042 vector<int> g[MAX];
-58d vector<int> gi[MAX];
-981 vector<int> g_scc[MAX]; 
-c5a int vis[MAX];
-ee6 stack<int> S;
-a52 int comp[MAX];
-
-1ca void dfs(int k) {
-59a 	vis[k] = 1;
-7b1 	for (int i = 0; i < g[k].size(); i++)
-8d5 		if (!vis[g[k][i]]) dfs(g[k][i]);
-    
-58f 	S.push(k);
-0a1 }
-
-436 void scc(int k, int c) {
-59a 	vis[k] = 1;
-52c 	comp[k] = c;
-309 	for (int i = 0; i < gi[k].size(); i++)
-bf6 		if (!vis[gi[k][i]]) scc(gi[k][i], c);
-b43 }
-
-db8 void kosaraju() {
-991 	for (int i = 0; i < n; i++) vis[i] = 0;
-    
-158 	for (int i = 0; i < n; i++) if (!vis[i]) dfs(i);
-    
-991 	for (int i = 0; i < n; i++) vis[i] = 0;
-d32 	while (S.size()) {
-70b 		int u = S.top();
-7de 		S.pop();
-1d6 		if (!vis[u]) {
-fd4             com++;
-7d8             scc(u, com);
-35b         }
-96d     }
-f84 }
-
-// funcao para construir o grafo de componentes
-ad1 void build_component_graph() {
-687     for (int u = 0; u < n; u++) {
-4d5         for (int v : g[u]) {
-1ec             if (comp[u] != comp[v]) {
-6d1                 g_scc[comp[u]].push_back(comp[v]);
-5d9             }
-b1e         }
-1fb     }
-        //remove duplicatas
-002     for (int i = 1; i <= com; i++) {
-0a2         sort(g_scc[i].begin(), g_scc[i].end());
-4ad         g_scc[i].erase(unique(g_scc[i].begin(), g_scc[i].end()), g_scc[i].end());
-6bd     }
-382 }
-\end{lstlisting}
-
-\subsection{LCA Binary Lifting}
-\begin{lstlisting}
-039 int n, ancestor[MAXN][LOG+1], depth[MAXN], visited[MAXN];
-309 vector<vector<int>> graph;
-
-955 void dfs(int v, int p){
-cda     visited[v] = 1;
-d38     ancestor[v][0] = p;
-    
-c64     for (int i = 1; i <= LOG; i++){
-d14         ancestor[v][i] = ancestor[ancestor[v][i-1]][i-1];
-a6e     }
-    
-284     for (auto u : graph[v]){
-264         if (!visited[u]){
-cf4             depth[u] = depth[v]+1;
-412             dfs(u, v);
-813         }
-2a4     }
-f1b }
-
-c5d int lca(int v, int u){
-6ed     if (depth[v] < depth[u]) swap(v,u);
-    
-4f1     for (int i = LOG-1; i >=  0; i--){
-01e         if ((depth[v] - (1<<i)) >= depth[u]){
-ed6             v = ancestor[v][i];
-cc6         } 
-830     }
-    
-d77     if (u == v) return v;
-    
-4f1     for (int i = LOG-1; i >= 0; i--){
-c47         if (ancestor[v][i] != ancestor[u][i]){
-ed6             v = ancestor[v][i];
-fb0             u = ancestor[u][i];
-329         }
-921     }
-6c2     return ancestor[v][0];
-40e }
-\end{lstlisting}
-
-\subsection{LCA Sparse Table}
+\subsection{Manacher}
 \begin{lstlisting}
 /*
-172 Fazer um euler tour na arvore e inserir todas as vezes que visitamos um no
-6e7 Junto disso inserir a depth desse no em outro vetor
-9f5 no final, o intervalo entre a e b sera representado por todos os nos que visitamos no caminho entre a e b
-55b basta pegar o o no com altura minima nesse intervalo
-31f para saber o ponto incial desse intervalo, basta pegar o tin de a e b
-
-6e5 build O(N LOG N)
-8fc query O(1)
-
-b0d posso pensar em otimizar como chamo o lca guardando a ultima vez que o no foi chamado
+8fa Manacher para achar todos os palindromes e depois reconstruir eles
+48b Nao e eficiente pois utiliza substr O(size)
 c4c */
 
-4f6 int n, timer = 0, tin[MAX], depth[MAX];
-ba0 vector<int> et;
-227 pair<int,int> sp[MAX*2][LOG+1];
-309 vector<vector<int>> graph; //0 indexado
+fd3 vector<int> manacher_odd(string s) {
+163     int n = s.size();
+0cb     s = "$" + s + "^";
+1a9     vector<int> p(n + 2);
+187     int l = 0, r = 1;
+78a     for(int i = 1; i <= n; i++) {
+a1d         p[i] = min(r - i, p[l + (r - i)]);
+ce7         while(s[i - p[i]] == s[i + p[i]]) {
+fbd             p[i]++;
+dc2         }
+03e         if(i + p[i] > r) {
+26d             l = i - p[i];
+a69             r = i + p[i];
+4cc         }
+283     }
+fa1     return vector<int>(begin(p) + 1, end(p) - 1);
+08d }
 
-955 void dfs(int v, int p){
-8c5     tin[v] = et.size();
-490     et.push_back(v);
-284     for (auto u : graph[v]){
-58d         if (u!=p){
-cf4             depth[u] = depth[v]+1;
-412             dfs(u,v);
-490             et.push_back(v);
-f82         }
-7ac     }
-6e0 }
-
-07b void buildtable(){
-96d     for (int i = 0; i < (int)et.size(); i++){
-1e7         sp[i][0] = {depth[et[i]], et[i]};
-bcc     }
-2ae     for (int j = 1; j <= LOG; j++){
-538         for (int i = 0; i + (1<<(j-1)) < (int)et.size(); i++){
-d30             sp[i][j] = min (sp[i][j-1], sp[i+(1<<(j-1))][j-1]);
-985         }
-fd8     }
-641 }
-
-2b4 pair<int,int> query (int a, int b){
-bfb     int len =  b - a + 1;
-5e4     int lg = 31 - __builtin_clz(len);
-a57     return min(sp[a][lg], sp[b - (1<<lg) + 1][lg]);
-11c }
-
-7be int lca(int a, int b){
-fb2     if (tin[a] > tin[b]) swap(a,b);
-ce1     return query(tin[a], tin[b]).second;
-940 }
+4e5 vector<int> manacher(string s) {
+78f     string t;
+7e7     for(auto c: s) {
+870         t += string("#") + c;
+478     }
+9cc     auto res = manacher_odd(t + "#");
+b50     return res;
+cdc }
 
 0dd signed main() {
 5d6     winton;
-45f     int q;
-55a     cin >> n >> q;
-c02     graph.resize(n);
-f50     for (int i = 0; i < n-1; i++){
-ba2         int a, b;
-0a8         cin >> a >> b;
-9c7         graph[--a].push_back(--b);
-4c6         graph[b].push_back(a);
-601     }
-564     dfs(0,0);
-df6     buildtable();
-1f4     while(q--){
-ba2         int a, b;
-0a8         cin >> a >> b;
-450         a--;b--;
-092         int mac = lca(a,b);
-389         cout << depth[a] + depth[b] - 2*depth[mac] << endl;
-e88     }
+ac0     string s;
+a18     cin >> s;
     
-1e3 }
+bf9     vector<int> mnc = manacher(s);
+35c     vector<pair<int,int>> palindromes;
+63e     for (int i = 0; i < mnc.size(); i++){
+1e8         if (mnc[i]-1 > 0){
+8ad             palindromes.push_back({mnc[i]-1,i});//guarda os palindromes com {tamanho, centro}
+ad1         }
+b1c     }
+    
+668     sort(rall(palindromes));//ordena pelos maiores(opicional ne)
+603     for (auto &[size, centro] : palindromes){
+    
+04c         string pos;
+3f0         int st = ((centro - size)/2);
+ab5         pos = s.substr(st, size); //gera a substring daquele palindrome
+2dc     }
+bf9 }
 \end{lstlisting}
 
-\subsection{Minimum Spanning Tree}
+\subsection{String Hashing}
 \begin{lstlisting}
-d56 struct DSU {
-8f3 	vector<int> comp, sz;
-    
-c1b 	DSU(int n) : comp(n), sz(n, 1) {
-f7a 		iota(all(comp), 0);
-576 	}
-    
-151 	int find(int u) {
-dc3 		if (u == comp[u]) return u;
-a07 		return comp[u] = find(comp[u]);
-65f 	}
-    
-8bf 	bool merge(int a, int b) {
-605 		a = find(a), b = find(b);
-5c2 		if (a == b) return false;
-afa 		sz[a] += sz[b];
-ca8 		comp[b] = a;
-8a6 		return true;
-6bc 	}
-33f };
+// Complexidades:
+// construtor - O(|s|)
+// operator() - O(1)
+
+878 mt19937 rng((int) chrono::steady_clock::now().time_since_epoch().count());
  
-63d void solve(){
-14e     int n, m;
-aa3     cin >> n >> m;
-73b     vector<tuple<int,int,int>> edges; 
-370     DSU dsu(n);
-8f8     edges.resize(m);
-dd5        for (int i = 0; i < m; i++){
-684         int a, b, w;
-060         cin >> a >> b >> w;
-0d4         edges[i] = {w,a,b};
-261     }
-5c1     sort(all(edges));
-704     int cost = 0;
-dd5     for(int i = 0; i < m; i++){
-13d         auto [w,u,v] = edges[i];
-d19         if (dsu.merge(u,v)){
-45f             cost += w;
-b64         }
-ce9     }
-16f }
-\end{lstlisting}
+463 int uniform(int l, int r) {
+a7f 	uniform_int_distribution<int> uid(l, r);
+f54 	return uid(rng);
+d9e }
+ 
+9e0 template<int MOD> struct str_hash {
+c63 	static int P;
+dcf 	vector<ll> h, p;
+ea8 	str_hash(string s) : h(s.size()), p(s.size()) {
+7a2 		p[0] = 1, h[0] = s[0];
+ad7 		for (int i = 1; i < s.size(); i++)
+84c 			p[i] = p[i - 1]*P%MOD, h[i] = (h[i - 1]*P + s[i])%MOD;
+1ef 	}
+af7 	ll operator()(int l, int r) { // retorna hash s[l...r]
+749 		ll hash = h[r] - (l ? h[l - 1]*p[r - l + 1]%MOD : 0);
+dfd 		return hash < 0 ? hash + MOD : hash;
+3ba 	}
+116 };
+217 template<int MOD> int str_hash<MOD>::P = uniform(256, MOD - 1); // l > |sigma|
 
-\subsection{Pontos de Articulação}
-\begin{lstlisting}
-/*
-a7e Acha os articulation points do grafo
-c4c */
+295 vector<int> rabin_karp(string const& s, string const& t) {
+2b7     int S = s.size(), T = t.size();
+            
+d52     vector<int> p_pow(max(S, T)); 
+b60     p_pow[0] = 1; 
+8db     for (int i = 1; i < (int)p_pow.size(); i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
+        
+404     vector<int> h(T + 1, 0); 
+a59     for (int i = 0; i < T; i++) h[i+1] = (h[i] + (t[i] - 'a' + 1) * p_pow[i]) % MOD; //hash do texto(vetor a)
+        
+2d8     int h_s = 0; 
+535     for (int i = 0; i < S; i++) h_s = (h_s + (s[i]- 'a' + 1) * p_pow[i]) % MOD; //hash da string s (vetor b)
+        
+a15     vector<int> occurrences;
+fce     for (int i = 0; i + S - 1 < T; i++) {
+d38         int cur_h = (h[i+S] + MOD - h[i]) % MOD;
+7f5         if (cur_h == h_s * p_pow[i] % MOD) occurrences.push_back(i);
+77b     }
+831     return occurrences;
+78d }
 
-f7d int t, c, low[MAX], pre[MAX], visited[MAX];
-864 vector<int> graph[MAX], ans;
 
-955 void dfs(int v, int p){
-cda     visited[v] = 1;
-98b     low[v] = pre[v] = ++t;
-14e     bool art = false;
-236     int filhos = 0;
-284     for (auto u : graph[v]){
-264         if (!visited[u]){
-701             filhos++;
-412             dfs(u,v);
-c80             low[v] = min(low[v], low[u]);
+//struct para um vetor de strings
+//consegue retornar um vetor sem as strings que sao substrings de outras
+//consegue checar se o prefixo de uma string e o sufixo de outra
+
+803 struct hashing {
+2a9     int p_pow[MAX]; 
+52b     vector<int> hashes[11];
+3df     vector<string> strings;
+1a8     int n;
+        
+f09     hashing(int _n, vector<string> _a) : n(_n), strings(_a) {} 
     
-b71             if(low[v] >= pre[v]) art = true;
-4d8         }   
-4e6         else {
-2da             if (u == p) continue;
-39b             low[v] = min(low[v], pre[u]);
-acd         }
-f4f     }
-ca1     if (v == 1 && filhos >= 2) ans.push_back(v);
-021     if (v != 1 && art) ans.push_back(v);
-7fd }
+0a8     void build(){
+b60         p_pow[0] = 1; 
+    
+2cf         for (int i = 1; i < MAX; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
+bde         for (int i = 0; i < n; i++)hashes[i] = calcHash(strings[i]);
+e10     }
+    
+e10     vector<string> trim(){
+86b         vector<string> ret;
+            //funcao pra remover do vetor original as strings que sao substrings de outras
+            //nao preciso delas pra fazer a verificacao depois
+3c4         set<int> occurrences;
+603         for (int i = 0; i < n; i++){
+578             for (int j = 0; j < n; j++){
+4ce                 if (i == j) continue;
+680                 int S = strings[i].size(), T = strings[j].size();
+d36                 int h_s = hashes[i][S];
+568                 for (int k = 0; k + S - 1 < T; k++) {
+df2                     int cur_h = (hashes[j][k+S] + MOD - hashes[j][k]) % MOD;
+f30                     if (cur_h == h_s * p_pow[k] % MOD) occurrences.insert(i);
+e4e                 }
+b00             }
+f98         }
+603         for (int i = 0; i < n; i++){
+851             if (occurrences.find(i) != occurrences.end()) continue;
+07c             ret.push_back(strings[i]);
+aa6         }
+9ca         debug(occurrences);
+edf         return ret;
+391     }
+        
+5ae     vector<int> calcHash(string s){
+fa3         vector<int> h(s.size() + 1, 0); 
+18f         for (int i = 0; i < s.size(); i++) h[i+1] = (h[i] + (s[i] - 'a' + 1) * p_pow[i]) % MOD;
+81c         return h;
+a53     }
+        
+4c8     int get_hash(int l, int len, int idx){
+488         int r = l + len;
+915         return ((hashes[idx][r] + MOD - hashes[idx][l]) % MOD);
+96f     }
+    
+166     bool equal_substrings(int len, int i, int j) {
+2bf         if (!len) return true;
+    
+34c         int h1 = get_hash(0, len, i);
+393         int h2 = get_hash(strings[j].size() - len, len, j);
+    
+21f         int left  = (h1 * p_pow[strings[j].size()-len]) % MOD;
+eeb         int right = (h2) % MOD;
+7ef         return left == right;
+bda     }
+890 };
+
+//struct de hashing pra uma string so
+803 struct hashing {
+bfe     vector<int> h, p_pow;
+ac0     string s;
+1a8     int n;
+        
+e68     hashing(string _s) : n(_s.size()), s(_s), h(_s.size()+1, 0), p_pow(_s.size(), 0) {} 
+    
+0a8     void build(){
+b60         p_pow[0] = 1; 
+    
+25f         for (int i = 1; i < n; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
+18f         for (int i = 0; i < s.size(); i++) h[i+1] = (h[i] + (s[i] - 'a' + 1) * p_pow[i]) % MOD;
+6c1     }
+        
+    
+77c     int get_hash(int l, int len){
+488         int r = l + len;
+9c5         return ((h[r] + MOD - h[l]) % MOD);
+2b2     }
+    
+a15     bool equal_substrings(int len) {
+2bf         if (!len) return true;
+    
+925         int h1 = get_hash(0, len);
+8f8         int h2 = get_hash(n - len, len);
+    
+ba9         int left  = (h1 * p_pow[n-len]) % MOD;
+eeb         int right = (h2) % MOD;
+7ef         return left == right;
+c7c     }
+e94 };
+
+//double mod hashing
+803 struct hashing {
+ac0     string s;
+1a8     int n;
+7b9     vector<int> h1, h2;
+11e     vector<int> p1, p2;
+    
+502     hashing(const string &_s) : s(_s) {
+40c         n = (int)s.size();
+d13         h1.assign(n+1, 0);
+667         h2.assign(n+1, 0);
+918         p1.assign(n+1, 0);
+ef0         p2.assign(n+1, 0);
+138     }
+    
+0a8     void build() {
+c4b         p1[0] = 1;
+bf6         p2[0] = 1;
+78a         for (int i = 1; i <= n; i++) {
+382             p1[i] = (p1[i-1] * P1) % MOD1;
+7c1             p2[i] = (p2[i-1] * P2) % MOD2;
+3c9         }
+603         for (int i = 0; i < n; i++) {
+f06             int val = (s[i] - 'a' + 1);
+420             h1[i+1] = (h1[i] + val * p1[i]) % MOD1;
+6fe             h2[i+1] = (h2[i] + val * p2[i]) % MOD2;
+9e2         }
+231     }
+    
+67d     pair<int,int> get_hash(int l, int len) {
+488         int r = l + len;
+a93         int x1 = ((h1[r] - h1[l]) + MOD1) % MOD1;
+436         int x2 = ((h2[r] - h2[l]) + MOD2) % MOD2;
+199         return {x1, x2};
+9cc     }
+d3b };
 \end{lstlisting}
 
-\subsection{Toposort}
+\subsection{StringStream}
 \begin{lstlisting}
-// Fazer dfs pra pegar o indeg se necessario
-0ad int indeg[MAX];
-
-55b vector<int> order;
-26a queue<int> q;
-
-519 for (int i = 0; i < MAX; i++){
-ac5     if (indeg[i] == 0)q.push(i);
-3fd }
-14d while(!q.empty()){
-69f     int cur = q.front();   
-ba5     order.push_back(cur);
-833     q.pop();
-411     for (auto u : graph[cur]){
-472         indeg[u]--;
-f90         if (indeg[u] == 0)q.push(u);
-014     }
-f6a }
+141 vector<string> split_sentence(string s){
+942     stringstream ss(s);
+    
+6de     string word;
+    
+622     vector<string> v;
+    
+dac     while(getline(ss, word, ' ')){
+e6c         v.push_back(word);
+8e0     }
+6dc     return v;
+c7e }
 \end{lstlisting}
 
 \pagebreak
@@ -2931,17 +4016,6 @@ f6a }
 %%%%%%%%%%%%%%%%%%%%
 
 \section{Extra}
-
-\subsection{random.cpp}
-\begin{lstlisting}
-#include <random>
-#include <chrono>
-
-mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
-uniform_int_distribution<long long> dist(0, n);//valores min e max
-
-int x = dist(rng);
-\end{lstlisting}
 
 \subsection{debug.cpp}
 \begin{lstlisting}
@@ -3203,6 +4277,17 @@ template<typename T> ostream& operator<<(ostream& os, min_pq<T> q) {
 }
 \end{lstlisting}
 
+\subsection{random.cpp}
+\begin{lstlisting}
+#include <random>
+#include <chrono>
+
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+uniform_int_distribution<long long> dist(0, n);//valores min e max
+
+int x = dist(rng);
+\end{lstlisting}
+
 \subsection{Template.cpp}
 \begin{lstlisting}
 //Template
@@ -3232,6 +4317,74 @@ void dbg_out(H h, T... t) { cerr << ' ' << h; dbg_out(t...); }
 signed main(){
     bg3;
 }
+\end{lstlisting}
+
+\subsection{prefix sum 2d.cpp}
+\begin{lstlisting}
+//Prefix Sum 2D
+
+prefix[i][j]= prefix[i-1][j]+prefix[i][j-1]-prefix[i-1][j-1]+arr[i][j]​
+
+\end{lstlisting}
+
+\subsection{compressao.cpp}
+\begin{lstlisting}
+//compressao de coordenada para vector
+
+vector<int> v(n);
+vector<int> todos;
+for (int i = 0; i < n; i++){
+    cin >> v[i];
+    todos.push_back(v[i]);
+}
+
+sort(all(todos));
+todos.erase(unique(all(todos)), todos.end());
+int m = todos.size();
+
+vector<int> comp(n);
+for (int i = 0; i < n; i++){
+    comp[i] = lower_bound(all(todos), v[i]) - todos.begin();
+}
+\end{lstlisting}
+
+\subsection{lambda.cpp}
+\begin{lstlisting}
+long long ans = 0;
+
+auto lambda_padrao = [&](int x, int y) -> int {
+    return x + y;
+};
+
+auto lambda_generica = [&](const auto &v) {
+    return (int)v.size();
+};
+
+auto lambda_recursiva = [&](auto &&self, int x) -> int {
+    if (x <= 1) return 1;
+    return x * self(self, x - 1);
+};
+
+function<void(int, int)> dfs = [&](int v, int p) {
+    for (auto u :graph[v]){
+        if (u == v) continue;
+        dfs(u,v);
+    }
+};
+
+auto reduce = [&](const multiset<string> &ms) -> multiset<int> {
+    multiset<int> mi;
+    for (const auto &s : ms) {
+        if (s.size() > 1) {
+            mi.insert((int)s.size());
+            ans++;
+        } else {
+            mi.insert(s[0] - '0');
+        }
+    }
+    return mi;
+};
+
 \end{lstlisting}
 
 \end{document}
