@@ -1,9 +1,7 @@
 //Manacher
 
-/*
-Manacher para achar todos os palindromes e depois reconstruir eles
-Nao e eficiente pois utiliza substr O(size)
-*/
+//Manacher para achar todos os palindromes e depois reconstruir eles
+//Nao e eficiente pois utiliza substr O(size)
 
 vector<int> manacher_odd(string s) {
     int n = s.size();

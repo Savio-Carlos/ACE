@@ -1,5 +1,4 @@
-//Drone Control (3 Equa, 4 Vars)
-//
+//3 equacoes 4 variaveis
 // n(s) = r + s
 // e(s) = (y+p-r)/2 - s
 // w(s) = (y-p-r)/2 - s
@@ -21,7 +20,6 @@
  
 // smin = max(-a,b,c,0)
 // smax = max(-a,b,c,0)
-// 
 signed main(){
     int q;
     cin >> q;

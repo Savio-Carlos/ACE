@@ -1,3 +1,4 @@
+//BIT
 struct BIT{
     vector<int> bit;
     int n;

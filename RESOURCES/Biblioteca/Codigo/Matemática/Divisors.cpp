@@ -1,3 +1,4 @@
+//Divisores
 vector<int> divisors;
 for (int i = 1; i * i <= tot; ++i) {
 if (tot % i == 0) {
