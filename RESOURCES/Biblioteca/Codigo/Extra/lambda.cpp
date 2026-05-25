@@ -15,7 +15,7 @@ auto lambda_recursiva = [&](auto &&self, int x) -> int {
 
 function<void(int, int)> dfs = [&](int v, int p) {
     for (auto u :graph[v]){
-        if (u == v) continue;
+        if (u == p) continue;
         dfs(u,v);
     }
 };
