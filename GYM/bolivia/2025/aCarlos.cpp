@@ -104,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define fastio (void)0
@@ -114,90 +114,58 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
-struct frac {
-    int num, den; 
-    
-    frac(int num_ = 0, int den_ = 1) : num(num_), den(den_){
-        assert(den != 0);
-        if(den < 0) num *= -1, den *= -1;
-        int g = gcd(abs(num), den);
-        num /= g, den /= g;
-    }
-
-    friend frac operator*(const frac& l, const frac& r){
-        return {l.num*r.num, l.den*r.den};
-    }
-
-    friend frac operator*(int a, const frac& r){
-        return {a*r.num, r.den};
-    }
-
-    friend frac operator+(const frac& l, const frac& r){
-        return {l.num*r.den + l.den*r.num, l.den*r.den};
-    }
-
-    friend frac operator/(const frac& l, const frac& r){
-        return {l.num*r.den, l.den*r.num};
-    }
-    void frac_abs(){
-        num = abs(num);
-        den = abs(den);
-    }
-
-    friend ostream& operator<<(ostream& out, frac f) {
-		out << f.num << '/' << f.den;
-		return out;
-	}
-};
-
 int A, B, C, L, R;
 
-const int N = 3*100;
-
-frac f(frac x){
-    frac r(A*x.num*x.num + B*x.num + C, x.den);
-    r.frac_abs();
-    return r;
+int f(int x) {
+    return 2*A*x*x*x + 3*B*x*x + 6*C*x;
 }
 
-frac integrate(int a, int b){
-    frac s;
-    frac h(a-b,N);
-    h.frac_abs();
+void solve(){
+    cin >> A >> B >> C >> L >> R;
 
-    for (int i = 1; i < N; i++){
-        frac x(i*h);
-        x = x + a;
-        x.frac_abs();
-        frac som = f(x);
-        som.frac_abs();
-        som = som * (i%3 ? 3 : 2);
-        s = s + som;
+    vector<int> splits;
+    int delta = B*B - 4*A*C;
+
+    int sq = sqrtl(delta);
+
+    int num1 = -B - sq;
+    int num2 = -B + sq;
+    int den1 = 2*A;
+
+    if (num1 % den1 == 0 && num2 % den1 == 0) {
+        int r1 = num1 / den1, r2 = num2 / den1;
+        if (r1 > r2) swap(r1, r2);
+        if (r1 > L && r1 < R) splits.push_back(r1);
+        if (r2 > L && r2 < R) splits.push_back(r2);
     }
-    frac aa(a);
-    frac bb(b);
-    aa.frac_abs();
-    bb.frac_abs();
-    frac r(f(aa) + s + f(bb));
-    r.frac_abs();
-    r = r*h;
-    r = r*3;
-    r = r/8;
-    r.frac_abs();
-    debug(s,r,h,aa,bb);
-    return r; 
-}
 
+    vector<int> pts = {L};
+    for (auto u : splits) pts.push_back(u);
+    pts.push_back(R);
+
+    sort(all(pts));
+    pts.erase(unique(all(pts)), pts.end());
+
+    int num = 0;
+    for (int i = 0; i + 1 < pts.size(); i++) {
+        int a = pts[i];
+        int b = pts[i+1];
+        int piece = f(b) - f(a);
+        num += llabs(piece);
+    }
+
+    int den = 6;
+    int g = gcd(llabs(num), den);
+    num /= g;
+    den /= g;
+
+    cout << num << '/' << den << '\n';
+}
+ 
 signed main(){
     fastio;
     int t;
     cin >> t;
-    while(t--){
-        // int a, b, c, l, r;
-        cin >> A >> B >> C >> L >> R;
-        frac res = integrate(L,R);
-        cout << res.num << "/" << res.den << endl;;
-    }
-
+    while (t--) solve();    
 }
+ 
