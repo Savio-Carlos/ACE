@@ -34,13 +34,13 @@ using namespace dbg;
 #define DEBUG
 
 #ifdef DEBUG
-    #define rapidinho (void)0
+    #define fastio (void)0
     #define debug(...) cerr << "[" << __LINE__ << "] ", out(#__VA_ARGS__, __VA_ARGS__)
 #else
-    #define rapidinho ios_base::sync_with_stdio(false), cin.tie(NULL)
+    #define fastio ios_base::sync_with_stdio(false), cin.tie(NULL)
     #define debug(...) (void)0
 #endif
 
 signed main(){
-    rapidinho;
+    fastio;
 }
