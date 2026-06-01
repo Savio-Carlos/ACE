@@ -8,6 +8,10 @@ using namespace std;
 #define int long long
 #define ld long double
 
+#define debug(x)  cerr << #x << ": " << x << endl
+#define debugv(x) cerr << #x << ": "; for(auto i : x) cerr << i << " "; cerr << endl
+#define debugp(x) cerr << #x << ": " << x.first << " " << x.second << endl
+
 namespace dbg {
     template<class A, class B> ostream& operator<<(ostream& o, const pair<A,B>& p) {
         return o << '(' << p.first << ", " << p.second << ')';
