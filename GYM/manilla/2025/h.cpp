@@ -6,6 +6,7 @@ using namespace std;
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
+#define debug(x) cerr << #x << ": " << x << endl;
 
 #define fastio ios_base::sync_with_stdio(0),cin.tie(0)
 
@@ -46,6 +47,31 @@ signed main(){
     fastio;
 
     sieve();
+    auto primos = brimos(MAX);
+
+    vector<int> pfx, prime_cnt;
+    int cur = 0;
+    int cur_cnt = 0;
+    for (int i = 0; i < MAX; i++){
+        if (is_prime[i]){
+            cur = (cur + i) % MOD;
+            cur_cnt++;
+        } 
+        pfx.push_back(cur);
+        prime_cnt.push_back(cur_cnt);
+    }
+
+    vector<int> pfx_duplas, duplas_cnt;
+    cur = 0;
+    cur_cnt = 0;
+    for(int i = 0; i < MAX; i++){
+        if(i >= 3 && is_prime[i] && is_prime[i - 2]){
+            cur = (cur + i) % MOD;
+            cur_cnt++;  
+        }
+        pfx_duplas.push_back(cur);
+        duplas_cnt.push_back(cur_cnt);
+    }
 
     int t;
     cin >> t;
@@ -53,29 +79,40 @@ signed main(){
     while(t--){
         int n, k;
         cin >> n >> k;
-        auto primos = brimos(n);
 
         if(k == 1){
-            cout << n + 1 << endl;
-        } else if(k == 2){
+            cout << n << endl;
+        } 
+        else if(k == 2){
             int ans = 0;
-            for(int i = 0; i < primos.size(); i++){
-                ans += n - primos[i];
-                ans %= MOD;
-            }
+            if (n >= 2) ans = (((n*prime_cnt[n]) % MOD) - pfx[n] + MOD) % MOD;
+
+            // for(int i = 0; i < primos.size() && primos[i] <= n; i++){
+            //     ans += n - primos[i];
+            //     ans %= MOD;
+            // }
             cout << ans << endl;
 
         } else if (k == 3){
             int ans = 0;
-            vector<int> aux;
-            for(int i = 0; i < primos.size(); i++){
-                if(is_prime[primos[i] + 2]){
-                    if(n - primos[i] - 2 > 0) ans += n - primos[i] - 2 + MOD;
-                    ans %= MOD;
-                }
-            }
+            // debug(n);
+            // debug(duplas_cnt[n]);
+            // debug(pfx_duplas[n]);
+            if (n >= 5) ans = (((n*duplas_cnt[n]) % MOD) - pfx_duplas[n] + MOD) % MOD;
+            // for(int i = 0; i < primos.size(); i++){
+            //     if(is_prime[primos[i] + 2]){
+            //         if(n - primos[i] - 2 > 0) ans += n - primos[i] - 2 + MOD;
+            //         ans %= MOD;
+            //     }
+            // }
             cout << (2 * ans) % MOD << endl;
-        } else {
+        } 
+        else if (k == 4){
+            int ans = 0;
+            if (n > 7) ans = n-7;
+            cout << (ans) % MOD << endl;
+        }
+        else {
             cout << 0 << endl;
         }
     }

@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define int long long
+#define ll long long
 #define ld long double
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
@@ -9,42 +9,52 @@ using namespace std;
 
 #define fastio ios_base::sync_with_stdio(0),cin.tie(0)
 
-const int MAXN = 300;
-int grid[MAXN][MAXN];
-int custo[MAXN];
-int n, m;
-
-map<pair<int, string>, int> dp;
-
-int pd(int idx, string visitados){
-    if(idx == n) return 0;
-    if(dp.find({idx, visitados}) != dp.end()) return dp[{idx, visitados}];
-
-    string nmask = visitados;
-    int res = LLONG_MAX;
-    for(int j = 0; j < m; j++){
-        int cost = 0;
-        if(visitados[j] == '0') cost = custo[j];
-        nmask[j] = '1';
-        res = min(res, pd(idx+1, nmask) + cost + grid[idx][j]);
-        nmask[j] = visitados[j];
-    }
-    return dp[{idx, visitados}] = res;
-}
 
 void solve(){
+    int n, m;
     cin >> n >> m;
-    dp.clear();
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++) cin >> grid[i][j];
-    }
-    string s = "";
-    for(int i = 0; i < m; i++){
-        cin >> custo[i];
-        s += "0";
+
+    vector<vector<int>>grid(n,vector<int>(m));
+    for (auto &u : grid){
+        for(auto &i : u) cin >> i;
     }
 
-    cout << pd(0, s) << endl;
+    vector<int> d(m);
+    for(auto &u : d) cin >> u;
+
+    auto f1 = [&]() -> int {
+        int tot = (1 << m) - 1;
+
+        ll ans = 1e18;
+
+        for (int mask = 1; mask <= tot; mask++){
+            ll cur = 0;
+            for (int pos = 0; pos < m; pos++){
+                if ((1 << pos) & mask){
+                    cur += d[pos];
+                }
+            }
+
+            for (int li = 0; li < n; li++){
+                ll mn = 1e16;
+                for (int co = 0; co < m; co++){
+                    if ((1 << co) & mask){
+                        mn = min(mn, grid[li][co]);
+                    }
+                }
+                cur += mn;
+            }
+            ans = min(ans, cur);
+        }
+
+        return ans;
+
+    };
+
+
+
+    if (m <= n) cout << f1() << endl;
+    else cout << f2() << endl;
 }
 
 signed main(){
