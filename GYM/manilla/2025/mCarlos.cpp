@@ -159,28 +159,28 @@ void solve(){
         ll ans = 1e18;
         int tot = (1 << n);
 
-        vector<pair<ll,int>> dp(tot, {1e18, -1});
-        dp[0] = {0, -1};
+        vector<ll> dp(tot, 1e18);
+        dp[0] = 0;
 
         for (int ro = 0; ro < m; ro++){
-            for (int li = 0; li < n; li++){
-                for (int mask = 0; mask < tot; mask++){
+            vector<ll> ndp(tot, 1e18);
+            
+            for (int mask = 0; mask < tot; mask++) ndp[mask] = dp[mask] + d[ro];
+
+            for (int mask = 0; mask < tot; mask++){
+                for (int li = 0; li < n; li++){
                     if ((1 << li) & mask) continue;
-                    auto [val, last] = dp[mask];
 
                     int nmask = (mask | (1 << li));
-                    
-                    ll nval = val + grid[li][ro];
-                    
-                    if (last < li) nval += d[ro];
-
-                    if (nval <= dp[nmask].first) dp[nmask] = {nval, ro};
+                    ndp[nmask] = min(ndp[nmask], ndp[mask] + grid[li][ro]);
 
                 }
             }
+
+            for (int mask = 0; mask < tot; mask++) dp[mask] = min(dp[mask], ndp[mask]);
+            debug(ro, dp);
         }
-        debug(dp);
-        return dp[tot-1].first;
+        return dp.back();
     };
 
     if (m <= n) cout << f1() << endl;
