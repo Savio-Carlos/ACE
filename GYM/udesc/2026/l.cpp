@@ -104,32 +104,58 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
-    #define winton (void)0
+    #define winton (void)0  
     #define debug(...) do { cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "] " << RESET; dbg::debug_out(#__VA_ARGS__, __VA_ARGS__); } while (0)
 #else
     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
     #define debug(...) ((void)0)
 #endif
 
+int fastExpo(int base, int exp) {
+    int res = 1;
+    while(exp) {
+        if (exp & 1) res = res * base;
+        base = base * base;
+        exp >>= 1;
+    }
+    return res;
+}
+
 signed main(){
     winton;
-    int n, m;
-    cin >> n >> m;
-    vector<pair<int,int>> a(n);
-    for (auto &[u,v]:a)cin>>u>>v;
-    sort(all(a));
-    vector<int> lis;
-    for (auto [x,y] : a){
-        int pos = upper_bound(all(lis), y) - lis.begin();
-        debug(lis);
-        debug(x, y);
-        if (pos == (int)lis.size()) lis.push_back(y);
-        else lis[pos] = y;
-        debug(lis);
+    int x;
+    cin >> x;
+    int mx = sqrt(x);
+    int cnt = 0;
+    for (int y = 1; y <= mx; y++){
+        int b = (x-y)/y;
+        if ((x-y)%b == 0){
+            debug("base: ", b, y);
+            cnt++;
+        } 
     }
-    cout << lis.size() << endl;
+    for (int b = 2; b <= mx; b++){
+        int digitos = (log(x)/log(b));
+        // debug(digitos);
+        int cur = x;
+        vector<int> numero;
+        for (int i = digitos; i >= 0; i--){
+            int p = fastExpo(b, i);
+            //achar o maior a tal que a*p <= x
+            int goal = cur/p;
+            cur -= goal*p;
+            numero.push_back(goal);
+        }
+        if (cur != 0)continue;
+        debug(b, numero);
+        int xr = 0;
+        for (auto u : numero) xr ^= u;
+        if (!xr) cnt++;
+    }
+    debug(cnt);
+    cout << cnt << endl;
 }
 
