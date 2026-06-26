@@ -114,31 +114,34 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
+int fastExpo(int base, int exp) {
+    int res = 1;
+    while(exp) {
+        if (exp & 1) res = res * base;
+        base = base * base;
+        exp >>= 1;
+    }
+    return res;
+}
+
 signed main(){
     winton;
     int x;
     cin >> x;
-    if (x == 1){
-        cout << 0 << endl;
-        return 0;
-    }
-    int mx = sqrt(x);
     int cnt = 0;
-    for (int y = 1; y <= mx; y++){
-        int b = (x-y)/y;
-        if ((x-y)%b == 0 && y < b){
-            debug("base: ", b, y);
-            cnt++;
-        } 
-    }
-    for (int b = 2; b <= mx; b++){
+    for (int b = 2; b <= x; b++){
+        int digitos = (log(x)/log(b));
+        // debug(digitos);
         int cur = x;
         vector<int> numero;
-        while(cur){
-            numero.push_back(cur%b);
-            cur/=b;
+        for (int i = digitos; i >= 0; i--){
+            int p = fastExpo(b, i);
+            //achar o maior a tal que a*p <= x
+            int goal = cur/p;
+            cur -= goal*p;
+            numero.push_back(goal);
         }
-
+        if (cur != 0)continue;
         int xr = 0;
         for (auto u : numero) xr ^= u;
         if (!xr){
