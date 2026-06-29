@@ -175,3 +175,29 @@ int inpol(vector<pt>& v, pt p){ // O(n)
 	}
 	return qt != 0;
 }
+
+vector<pt> convex(vector<pt> v){
+    sort(all(v));
+    v.erase(unique(all(v)), v.end());
+    /*
+    IMPORTANTE! em casos que pede o convex hull incluindo pontos colineares, mudar o ccw para >=
+    */
+    if(v.size() <= 1) return v;
+    vector<pt> l, u;
+    for(int i = 0; i < v.size(); i++){
+        while(l.size() > 1 and !ccw(l.end()[-2], l.end()[-1], v[i])){
+            l.pop_back();
+        }
+        l.push_back(v[i]);
+    }
+    for(int i = v.size() - 1; i >= 0; i--){
+        while(u.size() > 1 and !ccw(u.end()[-2], u.end()[-1], v[i])){
+            u.pop_back();
+        }
+        u.push_back(v[i]);
+    }
+    l.pop_back();
+    u.pop_back();
+    for(pt i : u) l.push_back(i);
+    return l;
+}

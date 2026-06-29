@@ -19,6 +19,11 @@ struct pt {
         if(x!=p.x) return x<p.x;
         return y < p.y;
     }
+
+    bool operator == (const pt p) const {
+		return x == p.x and y == p.y;
+	}
+
     pt operator +(const pt p)const{return pt(x+p.x, y+p.y);}
     pt operator -(const pt p)const{return pt(x-p.x, y-p.y);}
     pt operator *(const int c)const{return pt(x*c, y*c);}
@@ -44,6 +49,7 @@ bool ccw(pt p, pt q, pt r){
 
 vector<pt> convex(vector<pt> v){
     sort(all(v));
+    v.erase(unique(all(v)), v.end());
 
     if(v.size() <= 1) return v;
     vector<pt> l, u;
@@ -80,6 +86,6 @@ signed main(){
     vector<int> ans;
     for (auto p : cv)ans.push_back(mp[p]);
     sort(all(ans));
-    ans.erase(unique(all(ans)), ans.end());
+    // ans.erase(unique(all(ans)), ans.end());
     for(auto u : ans) cout << u << " ";
 }
