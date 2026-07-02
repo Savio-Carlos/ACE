@@ -53,7 +53,7 @@ int combinations(int n, int k) {
     }
     return res;
 }
-
+//quando o denominador eh pequeno
 int combinations_mod(int n, int k) {
     if (k < 0 || k > n)  return 0;
     if (k == 0 || k == n) return 1;
