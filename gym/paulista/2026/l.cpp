@@ -104,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -114,109 +114,60 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-char res[] = {'<','=','>'};
-
-void print(int i){
-    cout << res[i] << endl;
-    exit(0);
-}
-//tudo inutil nesse codigo o mc.cpp resolve bem mais facil
 void solve(){
-    string s, t;
-    int p, q;
-    cin >> s >> t >> p >> q;
-    int n = s.size(), m = t.size();
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    cin >> a;
 
-    if (p == 0 or q == 0) print(1);
-
-    bool frag = false;
-    int mn = min(n,m);
-    string c;
-    if (n < m){
-        c = t.substr(0, mn);
-        if (c == s) frag = true;
-        debug(c);
-    } 
-    else {
-        c = s.substr(0, mn);
-        debug(c);
-        if (c == t) frag = true;
-    }   
-    if (!frag){
-        if (s < t) print(0);
-        else if (s == t) print(1);
-        else print(2);
-    }
-    debug("passou");
-    
-    if (n%m == 0 or m%n == 0){
-        string menor;
-        if (n < m){
-            menor = s;
-            while(menor.size() < t.size()) menor += s;
-            debug(menor);
-            if (menor == t) print(1);
-            else if (menor < t) print(0);
-            else print(2);
+    auto score = [&](int mid, const vector<int> &v) -> int{
+        string s = "";
+        int r = 0;
+        for (int i = 0; i < v.size(); i++){
+            if (i == mid) continue;
+            s += (v[i] < mid ? "E" : "D");
+            if (s.size() > 1 and s.back() != s.rbegin()[1]) r++;
         }
-        else {
-            menor = t;
-            while(menor.size() < s.size()) menor += t;
-            if (menor == s) print(1);
-            else if (menor > s) print(0);
-            else print(2);
+        // debug(mid, s);
+        return r;
+    };
+
+    auto find_best = [&](const vector<int> &v) -> int{
+        int r = 0;
+        int best = v[0];
+        for (auto u : v){
+            int x = score(u,v);
+            if (x > r){
+                r = x;
+                best = u;
+            }
         }
-    }
-    debug("333333333");
-    string tt = t+t;
-    string ss = s+s;
-    debug(tt, ss);
-    
-    if (s.find_first_not_of(s[0]) == s.npos and t.find_first_not_of(t[0]) == t.npos){
-        if (s[0] == t[0]) print(1);
-        if (s[0] < t[0]) print(0);
-        print(2);
-    } 
-    int sp = s.size() * p;
-    int tp = t.size() * q;
-    
+        return best;
+    };
 
-    debug(ss, tt,tt.substr(0, ss.size()), ss.substr(00, tt.size()));
-    if(ss < tt.substr(0, ss.size())) print(0);
-    if(tt < ss.substr(00, tt.size())) print(2);
-    string st = s + t;
-    string ts = t + s;
-
-    debug(sp, tp);
-    if (sp < tp){
-        debug("1");
-        string ss1 = {s[n-1],t[0]};
-        string tt1 = {t[(sp%m - 1 + m) % m], t[sp%m]};
-        debug(ss1, tt1);
-        if (ss1 < tt1) print(0);
-        if (ss1 > tt1) print(2);
-    }
-    if (sp == tp){
-        debug("2");
-        string ss1 = {s[n-1], t[0]};
-        string tt1 = {t[m-1], s[0]};
-        debug(ss1, tt1);
-        if (ss1 < tt1) print(0);
-        if (ss1 > tt1) print(2);
-    }
-    if (tp < sp){
-        debug("3");
-        string tt1 = {t[m-1], s[0]};
-        string ss1 = {s[(tp%n - 1 + n) % n], s[tp%n]};
-        debug(ss1, tt1);
-        if (ss1 < tt1) print(0);
-        if (ss1 > tt1) print(2);
-    }
-    if (st < ts) print(0);
-    if (st > ts) print(2);
-
-    print(1);
-
+    int ans = 0;
+    function<void (const vector<int>&)> dv = [&](const vector<int> &v){
+        if (v.size() <= 1) return;
+        int x = find_best(v);
+        debug(v, x);
+        vector<int> l, r;
+        string s = "";
+        for (int i = 0; i < v.size(); i++){
+            if (v[i] < x){
+                l.push_back(v[i]);
+                s += "L";
+            }
+            else if (v[i] > x){
+                r.push_back(v[i]);
+                s += "R";    
+            }
+            if (s.size() > 1 and s.back() != s.rbegin()[1]) ans++;
+        }
+        dv(l);
+        dv(r);
+    };
+    dv(a);
+    cout << ans << endl;
 }
 
 signed main(){

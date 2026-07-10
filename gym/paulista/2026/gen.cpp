@@ -104,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -114,115 +114,35 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-char res[] = {'<','=','>'};
-
-void print(int i){
-    cout << res[i] << endl;
-    exit(0);
-}
-//tudo inutil nesse codigo o mc.cpp resolve bem mais facil
-void solve(){
-    string s, t;
-    int p, q;
-    cin >> s >> t >> p >> q;
-    int n = s.size(), m = t.size();
-
-    if (p == 0 or q == 0) print(1);
-
-    bool frag = false;
-    int mn = min(n,m);
-    string c;
-    if (n < m){
-        c = t.substr(0, mn);
-        if (c == s) frag = true;
-        debug(c);
-    } 
-    else {
-        c = s.substr(0, mn);
-        debug(c);
-        if (c == t) frag = true;
-    }   
-    if (!frag){
-        if (s < t) print(0);
-        else if (s == t) print(1);
-        else print(2);
-    }
-    debug("passou");
-    
-    if (n%m == 0 or m%n == 0){
-        string menor;
-        if (n < m){
-            menor = s;
-            while(menor.size() < t.size()) menor += s;
-            debug(menor);
-            if (menor == t) print(1);
-            else if (menor < t) print(0);
-            else print(2);
-        }
-        else {
-            menor = t;
-            while(menor.size() < s.size()) menor += t;
-            if (menor == s) print(1);
-            else if (menor > s) print(0);
-            else print(2);
-        }
-    }
-    debug("333333333");
-    string tt = t+t;
-    string ss = s+s;
-    debug(tt, ss);
-    
-    if (s.find_first_not_of(s[0]) == s.npos and t.find_first_not_of(t[0]) == t.npos){
-        if (s[0] == t[0]) print(1);
-        if (s[0] < t[0]) print(0);
-        print(2);
-    } 
-    int sp = s.size() * p;
-    int tp = t.size() * q;
-    
-
-    debug(ss, tt,tt.substr(0, ss.size()), ss.substr(00, tt.size()));
-    if(ss < tt.substr(0, ss.size())) print(0);
-    if(tt < ss.substr(00, tt.size())) print(2);
-    string st = s + t;
-    string ts = t + s;
-
-    debug(sp, tp);
-    if (sp < tp){
-        debug("1");
-        string ss1 = {s[n-1],t[0]};
-        string tt1 = {t[(sp%m - 1 + m) % m], t[sp%m]};
-        debug(ss1, tt1);
-        if (ss1 < tt1) print(0);
-        if (ss1 > tt1) print(2);
-    }
-    if (sp == tp){
-        debug("2");
-        string ss1 = {s[n-1], t[0]};
-        string tt1 = {t[m-1], s[0]};
-        debug(ss1, tt1);
-        if (ss1 < tt1) print(0);
-        if (ss1 > tt1) print(2);
-    }
-    if (tp < sp){
-        debug("3");
-        string tt1 = {t[m-1], s[0]};
-        string ss1 = {s[(tp%n - 1 + n) % n], s[tp%n]};
-        debug(ss1, tt1);
-        if (ss1 < tt1) print(0);
-        if (ss1 > tt1) print(2);
-    }
-    if (st < ts) print(0);
-    if (st > ts) print(2);
-
-    print(1);
-
-}
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+uniform_int_distribution<int> chares('a', 'z');
+uniform_int_distribution<int> pq(1, 5);
+uniform_int_distribution<int> nm(1, 10);
 
 signed main(){
     winton;
-    int t = 1;
-    // cin >> t;
-    while(t--) solve();
+    int n = nm(rng);
+    int m = nm(rng);
+    string s = "";
+    string t = "";
+    for (int i = 0; i < n; i++){
+        char a = chares(rng);
+        s += a;
+    }
+    int tsize = pq(rng);
+    while (tsize > s.size()) tsize = pq(rng);
+    string tt = s.substr(0, tsize);
+
+    for (int i = 0; i < m; i++){
+        char a = chares(rng);
+        t += s;
+    }
+    t += tt;
+    int p = pq(rng);
+    int q = pq(rng);
+    cout << s <<endl;
+    cout << t << endl;
+    cout << p << endl;
+    cout << q << endl;
 }
 
