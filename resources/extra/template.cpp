@@ -42,11 +42,6 @@ ostream& operator<<(ostream& os, const Container& c) {
 #define ld long double
 #define endl '\n'
 
-void setIO(string s){
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 signed main(){
 	fastio;
 	

@@ -2,7 +2,7 @@
 
 # 1. Define where your template file lives
 # Change "template.cpp" to whatever your actual template file is named
-TEMPLATE_FILE="$HOME/ACE/RESOURCES/extra/template.cpp"
+TEMPLATE_FILE="$HOME/ACE/resources/extra/template.cpp"
 
 # 2. Check if the user provided a name for the new file
 if [ -z "$1" ]; then
