@@ -41,11 +41,14 @@ struct DSU {
 
 	int find(int a) { return a == id[a] ? a : id[a] = find(id[a]); }
 
-	void unite(int a, int b) {
-		a = find(a), b = find(b);
-		if (a == b) return;
+	bool unite(int a, int b) {
+		a = find(a);
+        b = find(b);
+		if (a == b) return false;
 		if (sz[a] < sz[b]) swap(a, b);
-		sz[a] += sz[b], id[b] = a;
+		sz[a] += sz[b];
+        id[b] = a;
+        return true;
 	}
 };
 

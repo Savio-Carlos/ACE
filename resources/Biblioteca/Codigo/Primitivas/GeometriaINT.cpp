@@ -16,6 +16,8 @@ struct pt {
     pt operator + (const pt& p) const { return pt(x + p.x, y + p.y); }
     pt operator - (const pt& p) const { return pt(x - p.x, y - p.y); }
     template<typename U> 
+    pt operator / (const U c) const { return pt(x / c, y / c); }
+    template<typename U> 
     pt operator * (const U c) const { return pt(x * c, y * c); }
     int operator * (const pt& p) const { return x * p.x + y * p.y; }
     int operator ^ (const pt& p) const { return x * p.y - y * p.x; }
@@ -76,7 +78,8 @@ int sarea2(pt p, pt q, pt r) {
 	return (q-p)^(r-q);
 }
 
-bool col(pt p, pt q, pt r) { // se p, q e r sao colin.
+// se p, q e r sao colin.
+bool col(pt p, pt q, pt r) { 
 	return sarea2(p, q, r) == 0;
 }
 
@@ -115,6 +118,11 @@ void polarSort(vector<pt> &v) {
 //rotaciona o vetor 90 graus
 pt rotate90(pt p) {
 	return pt(-p.y, p.x);
+}
+
+//retorna um ponto que esta no centro entre outros dois pontos
+pt meio(pt p, pt q){
+    return (p+q)/2;
 }
 
 //retorna uma linha perpendicular a linha s que passa pelo ponto p
