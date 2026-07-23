@@ -21,9 +21,9 @@ ostream& operator<<(ostream& os, const std::pair<T, U>& p) {
 
 template <typename T>
 concept IterableContainer = requires(T t) {
-	begin(t);
-	end(t);
-} && !same_as<T, string> && !same_as<T, string_view>;
+    begin(t);
+    end(t);
+} && !is_convertible_v<T, string_view>;
 
 template<IterableContainer Container>
 ostream& operator<<(ostream& os, const Container& c) {
