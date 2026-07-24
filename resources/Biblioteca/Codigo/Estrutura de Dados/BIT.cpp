@@ -1,5 +1,6 @@
 //BIT
 struct BIT{
+	//1 indexada
     vector<int> bit;
     int n;
     void init(int _n){

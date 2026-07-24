@@ -1,4 +1,4 @@
-// BIT
+// BIT de Xor
 //
 // BIT de xor 1-based
 // faz o xor no intervalo
