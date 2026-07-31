@@ -12,3 +12,4 @@ int pd(int i, int val){
 
     return dp[i][val] = min(pd(i-1, val - arr[i]) + weights[i], pd(i-1, val));
 }
+
