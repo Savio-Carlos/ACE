@@ -1,4 +1,14 @@
-//Path Queries 2
+// Path Queries 2
+//
+// Arvore com peso nos vertices; update de peso em um vertice e query do
+// maior peso no caminho entre dois vertices. HLD (Heavy-Light
+// Decomposition) + segtree iterativa (bottom-up) de maximo sobre o array
+// linearizado pela HLD.
+//
+// Complexidades:
+// build - O(n)
+// update - O(log n)
+// query_path - O(log^2 n)
 
 #include <bits/stdc++.h>
 using namespace std;

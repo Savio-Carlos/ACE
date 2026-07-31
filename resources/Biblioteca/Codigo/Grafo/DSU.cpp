@@ -1,4 +1,12 @@
-//DSU 
+// DSU (Union-Find)
+//
+// Duas implementacoes alternativas de DSU com path compression -- usar so uma
+// (as duas tem o mesmo nome de struct, nao da pra manter as duas no mesmo arquivo)
+// 1) union by rank: declarar DSU dsu; e chamar dsu.init(n) antes de usar
+// 2) union by size: inicializa direto no construtor, DSU dsu(n);
+//
+// Complexidades:
+// find / unite - O(alpha(n)) amortizado
 
 struct DSU{
     int n;

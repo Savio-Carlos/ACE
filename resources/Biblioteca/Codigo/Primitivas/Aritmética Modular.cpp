@@ -1,4 +1,16 @@
-//Aritmética Modular
+// Aritmética Modular
+//
+// mod_int<p>: inteiro modulo p com os operadores aritmeticos usuais
+// (+, -, *, /, unario -, ==, !=, IO) e exponenciacao rapida via operator^
+//
+// Complexidades:
+// +, -, *, unario - - O(1)
+// / e ^ (exponenciacao) - O(log(p)) (usa expo rapida pro inverso/potencia)
+//
+// p precisa ser primo (inversao usa Fermat: a^-1 = a^(p-2))
+// instancia: mod_int<p> x; ou typedef mint = mod_int<(int)MOD>;
+// operator*= faz v*a.v, que precisa caber em int; tirar o "(int)" se usar #define int long long
+// modiv(a, b) calcula a/b mod MOD fora da struct (depende de fastExpo estar definido)
 
 template<int p> struct mod_int {
 	int expo(int b, int e) {

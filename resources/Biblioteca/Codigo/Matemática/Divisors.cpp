@@ -1,4 +1,9 @@
-//Divisores
+// Divisores
+//
+// Calcula todos os divisores de tot
+//
+// Complexidades:
+// O(sqrt(tot))
 vector<int> divisors;
 for (int i = 1; i * i <= tot; ++i) {
 if (tot % i == 0) {

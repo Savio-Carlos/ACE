@@ -1,3 +1,11 @@
+// Random
+//
+// Gerador de numeros aleatorios (Mersenne Twister 64 bits) seedado com o clock,
+// mais um uniform_int_distribution pra sortear inteiros num intervalo
+//
+// dist(rng) retorna um long long uniforme em [0, n]
+// trocar os limites de dist conforme o intervalo desejado
+
 #include <random>
 #include <chrono>
 

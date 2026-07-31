@@ -1,4 +1,16 @@
-//Dynamic Inversions
+// Dynamic Inversions
+//
+// Permutacao de {1..n}; remove m elementos um a um e, antes de cada
+// remocao, imprime o numero de pares de inversao restantes ((i,j) com
+// i<j e A[i]>A[j]).
+// Conta as inversoes iniciais com uma BIT 2D (Fenwick de Fenwick, com
+// coordenadas comprimidas) sobre (posicao, valor); a cada remocao,
+// subtrai as inversoes que o elemento removido formava com quem sobrou
+// antes de tira-lo da estrutura.
+//
+// Complexidades:
+// build inicial - O(n log^2 n)
+// cada remocao - O(log^2 n)
 
 /*
 You are given a permutation {1,2,3,. . . ,n}. Remove m of them one by one, and output the number of

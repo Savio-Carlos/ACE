@@ -1,4 +1,20 @@
-//Digit DP
+// Digit DP
+//
+// Colecao de templates de DP sobre digitos (contar/somar numeros em
+// [0, R] ou [L, R] que satisfazem alguma propriedade)
+// - TEMPLATE 1: recursiva padrao para [0, R] (ou [1, R])
+// - TEMPLATE 2: recursiva para [L, R] simultaneo (dois limitantes tight)
+// - TEMPLATE 3: iterativa (push dp), propaga dp[index] para dp[index+1]
+// - exemplos completos abaixo: soma de digitos multipla de M e contagem de
+//   numeros com todos os digitos distintos (mascara dos digitos usados)
+//
+// Complexidades:
+// cada template - O(numDigitos * |estado|) por chamada de count/solve
+//
+// index = posicao do digito atual; tight/above/under = se os digitos ja
+// colocados ainda empatam com o limite; ldz = leading zero (numero ainda
+// nao "comecou"). Refazer memset(dp, -1, sizeof(dp)) sempre que o estado
+// (sum, mask, ...) mudar entre chamadas de count()
 // ==========================================
 // TEMPLATE 1: RECURSIVA Padrão [0, R] ou [1, R]
 // ==========================================

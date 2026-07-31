@@ -1,4 +1,12 @@
-//Coin Collector
+// Coin Collector
+//
+// Grafo dirigido com moedas em cada vertice; e permitido revisitar
+// vertices, entao todo ciclo pode ser totalmente coletado. Condensa o
+// grafo em SCCs (Kosaraju), soma as moedas de cada componente, e acha o
+// caminho de maior soma no DAG condensado (DP topologica).
+//
+// Complexidades:
+// O(n + m)
 
 vector<vector<int>> graph, rgraph;
 vector<set<int>> gcomp;

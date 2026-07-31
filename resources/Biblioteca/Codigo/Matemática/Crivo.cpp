@@ -1,4 +1,9 @@
-//Sieve
+// Crivo de Eratóstenes
+//
+// Calcula todos os primos ate MAX
+//
+// Complexidades:
+// sieve - O(MAX log(log(MAX)))
 
 vector<int> primes;
 

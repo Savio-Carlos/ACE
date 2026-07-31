@@ -1,4 +1,14 @@
-//Centro de Árvore
+// Centro de Árvore
+//
+// Acha o(s) centro(s) de uma arvore (vertice(s) que minimizam a maior
+// distancia ate qualquer outro vertice), via dupla BFS/DFS do diametro:
+// acha um extremo do diametro a partir de um vertice qualquer, acha o
+// outro extremo b a partir dele, e o(s) centro(s) sao os vertices cuja
+// soma das distancias ate os dois extremos e igual ao diametro (1 ou 2
+// vertices).
+//
+// Complexidades:
+// O(n)
 
 vector<vector<int>> graph;
 int n, dist[3][MAX];

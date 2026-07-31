@@ -1,4 +1,14 @@
-//Subtree Queries 
+// Subtree Queries
+//
+// Arvore com valor nos vertices; update de valor em um vertice e query da
+// soma de valores na subarvore de um vertice. Euler tour (tin/tout)
+// lineariza cada subarvore em um intervalo contiguo, respondido com uma
+// segtree de soma padrao.
+//
+// Complexidades:
+// build - O(n)
+// update - O(log n)
+// query - O(log n)
 
 const int MAXN = 2e5+7;
 

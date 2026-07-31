@@ -1,3 +1,13 @@
+// Template
+//
+// Boilerplate padrao pra abrir uma questao: bits/stdc++, operator>>/operator<<
+// pra pair e pra qualquer container iteravel (cin >> vector, cout << vector/set/...),
+// fastio e defines uteis (int como long long, ld, endl)
+//
+// copiar como base do arquivo .cpp
+// cuidado ao usar #define int long long: pode conflitar com size_t/unsigned e
+// com funcoes de biblioteca que esperam int de 32 bits
+
 #include <bits/stdc++.h>
 using namespace std;
 

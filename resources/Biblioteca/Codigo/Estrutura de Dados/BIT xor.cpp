@@ -1,13 +1,16 @@
-// BIT de Xor
+// BIT de Xor (Fenwick Tree)
 //
-// BIT de xor 1-based
-// faz o xor no intervalo
+// BIT 1-indexada (posicoes validas 1..n) que faz xor no intervalo.
 //
 // Complexidades:
-// build - O(n)
+// construtor - O(n)
 // update - O(log(n))
-// query - O(log(n))
- 
+// query  - O(log(n))
+//
+// Bit b(n); depois b.update(i, x) faz xor de x na posicao i (1-indexada);
+// b.pref(i) retorna o xor do prefixo [1, i] (pref(0) = 0);
+// b.query(l, r) retorna o xor do intervalo [l, r] (1-indexado)
+
 struct Bit {
 	int n;
 	vector<int> bit;

@@ -1,8 +1,21 @@
 // String Hashing
 //
+// Hashing polinomial de string(s), pra comparar substrings em O(1) e
+// buscar ocorrencias de um padrao (Rabin-Karp). Tem 3 versoes de struct
+// hashing (usar so uma, os nomes colidem): multi-string (com trim de
+// substrings redundantes), single-string, e single-string com double hashing
+//
 // Complexidades:
-// construtor - O(|s|)
-// operator() - O(1)
+// rabin_karp                  - O(|s| + |t|)
+// build (qualquer struct)     - O(|s|)
+// trim (struct multi-string)  - O(n^2 * |maior string|)
+// get_hash / equal_substrings - O(1)
+//
+// rabin_karp(s, t) retorna as posicoes onde s ocorre em t
+// get_hash(l, len) retorna o hash do intervalo [l, l+len)
+// equal_substrings(len) checa se o prefixo e o sufixo de tamanho len sao iguais
+// trim() remove do vetor original as strings que sao substring de outra
+// P, MOD (ou P1/MOD1/P2/MOD2 na versao double hash) e MAX devem estar definidos
 
 //string matching
 vector<int> rabin_karp(string const& s, string const& t) {

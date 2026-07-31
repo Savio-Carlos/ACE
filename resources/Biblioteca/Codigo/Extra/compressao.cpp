@@ -1,4 +1,14 @@
-//compressao de coordenada para vector
+// Compressao de Coordenadas
+//
+// Mapeia os valores de v pra indices [0, m) preservando a ordem relativa
+// (m = quantidade de valores distintos)
+//
+// Complexidades:
+// build - O(n log(n))
+// comp(x) - O(log(n))
+//
+// build direto: comp[i] = indice de v[i] em todos (vetor ordenado e sem duplicatas)
+// ou use a lambda comp(x) pra comprimir um valor qualquer on-the-fly
 
 vector<int> v(n);
 vector<int> todos;

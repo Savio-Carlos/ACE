@@ -1,4 +1,19 @@
-//Bitmask DP
+// Bitmask DP
+//
+// Colecao de templates de DP sobre subconjuntos (mascara de bits)
+// - pd(v, mask): conta, modulo MOD, o numero de caminhos hamiltonianos de 0
+//   ate n-1 em `graph`, tendo visitado o conjunto `mask` de vertices
+// - trecho iterativo/submasks: mesma contagem de caminhos hamiltonianos,
+//   partindo da cidade 0, com dp[mascara][cidade_atual]
+// - "merging subsets": template generico para iterar em O(3^n) sobre todo
+//   par (submask, mask^submask) de cada mascara
+//
+// Complexidades:
+// pd (recursiva) - O(2^n * n)
+// trecho iterativo/submasks - O(2^n * n^2)
+// merging subsets - O(3^n)
+//
+// MAXN = numero maximo de vertices, MAXM = 2^MAXN
 
 //hamiltonian path
 const int MAXN = 20;

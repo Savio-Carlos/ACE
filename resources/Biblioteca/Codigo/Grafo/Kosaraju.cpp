@@ -1,4 +1,15 @@
-//Kosaraju
+// Kosaraju
+//
+// Acha as componentes fortemente conexas (SCC) de um digrafo e monta,
+// opcionalmente, o grafo condensado (DAG de componentes)
+//
+// Complexidades:
+// kosaraju - O(n + m)
+// build_component_graph - O(m log(m))
+//
+// preencher g[MAX] (grafo original) e gi[MAX] (grafo transposto) antes de chamar kosaraju()
+// comp[v] = id da SCC de v ao final (1-indexado, comeca em 1)
+// build_component_graph monta g_scc[MAX] a partir de comp[], removendo arestas duplicadas
 
 int n, com;
 vector<int> g[MAX];

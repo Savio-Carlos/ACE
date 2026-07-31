@@ -15,12 +15,17 @@
 //
 // Presets prontos no fim do arquivo (soma+add, max+add, min+assign, MOD...).
 //
-// Complexidades: build O(n), query/update O(log n), find_first O(log n)
+// Complexidades:
+// build       - O(n)
+// query       - O(log n)
+// update      - O(log n)
+// pointSet    - O(log n)
+// find_first  - O(log n)
 //
-// API:
+// API (0-indexado):
 //   SegTree<Node,Tag> st(n);              // n folhas neutras
 //   SegTree<Node,Tag> st(vector<T>);      // build a partir de vetor
-//   st.update(l, r, Tag{...});            // atualiza range [l,r] (0-indexado)
+//   st.update(l, r, Tag{...});            // atualiza range [l,r]
 //   st.query(l, r).sum;                   // consulta range [l,r]
 //   st.pointSet(i, Node(x));              // seta a folha i
 //   st.find_first(l, r, pred);            // busca binaria na arvore (ver abaixo)

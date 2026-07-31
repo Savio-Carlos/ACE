@@ -1,6 +1,10 @@
-//Phi Function
-
-//quantos numeros sao coprimos com N de 1 ate N
+// Função de Euler (Phi)
+//
+// phi[i] = quantidade de numeros de 1 ate i que sao coprimos com i
+// precomputePHI precisa ser chamado antes de usar phi
+//
+// Complexidades:
+// precomputePHI - O(MAX log(log(MAX)))
 int phi[MAX];
 
 void precomputePHI(){

@@ -1,4 +1,13 @@
-//Query de Segtree Offline
+// Query de Segtree Offline
+//
+// Para cada query (l, m, r) (1-indexada), se o valor em l for menor que
+// m, conta quantos elementos no intervalo [l, l+r-1] tem valor >= m.
+// Processa as queries offline em ordem decrescente de m, inserindo na
+// segtree de soma (point update) os elementos cujo valor ja e >= m
+// conforme o limiar desce — sweep por valor.
+//
+// Complexidades:
+// O((n + q) log n)
 
 int n, tree[4*MAX];
 

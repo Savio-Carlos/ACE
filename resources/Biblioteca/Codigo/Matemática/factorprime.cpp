@@ -1,4 +1,11 @@
-//Fatoração Prima
+// Fatoração Prima
+//
+// Fatora n em primos por divisao por tentativa
+//
+// Complexidades:
+// factor - O(sqrt(n))
+//
+// factor(n) -> retorna vetor com os fatores primos de n (com repeticao)
 
 vector<int> factor(int n) {
     vector<int> primes;

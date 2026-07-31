@@ -1,4 +1,13 @@
-//Divisor Analysis
+// Divisor Analysis
+//
+// Dada a fatoracao em primos de n (pares (p_i, k_i)), calcula, modulo MOD:
+// quantidade, soma e produto dos divisores.
+// Soma usa a formula da PG (p^(k+1)-1)/(p-1) com inverso modular; produto
+// usa n^(d(n)/2), reduzindo o expoente modulo (MOD-1) (Fermat) — trata
+// separado o caso d(n) par/impar para nao dividir k_i por 2 fora de hora.
+//
+// Complexidades:
+// O(n log MOD) (dominado pelas exponenciacoes modulares)
 
 // quantidade, soma e produto dos divisores
 

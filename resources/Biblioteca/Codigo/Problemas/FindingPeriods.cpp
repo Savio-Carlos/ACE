@@ -1,4 +1,13 @@
-//Achar prefixos que formam a string toda
+// Finding Periods
+//
+// Para cada tamanho de prefixo i (1..n), verifica se i e um periodo da
+// string s, ou seja, se s[0..n-i-1] == s[i..n-1] (repetir o prefixo de
+// tamanho i, truncando o ultimo bloco, reconstroi s inteira).
+// Usa hashing polinomial para comparar os dois trechos em O(1).
+//
+// Complexidades:
+// O(n) apos montar os hashes
+
 const int MOD = 1e9+7;
  
 mt19937 rng((int) chrono::steady_clock::now().time_since_epoch().count());

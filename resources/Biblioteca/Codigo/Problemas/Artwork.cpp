@@ -1,7 +1,14 @@
-//Artwork
+// Artwork
 //
-//Grafo de varios circulos
-//saber se chega do 00 ao nm sem encostar nos circulos
+// Grade n x m com k circulos (obstaculos). Determina se e possivel ir de
+// (0,0) ate (n,m) sem tocar nenhum circulo.
+// Usa DSU para unir circulos que se tocam/sobrepoem; cada componente guarda
+// quais bordas do retangulo toca (esquerda/direita/baixo/cima). O caminho
+// fica bloqueado se algum componente tocar duas bordas que fecham um dos
+// cantos (0,0) ou (n,m), ou que atravessam de um lado ao outro.
+//
+// Complexidades:
+// O(k^2) para unir os circulos + O(k) para checar bloqueio
 
 int n, m, k; 
 struct DSU{

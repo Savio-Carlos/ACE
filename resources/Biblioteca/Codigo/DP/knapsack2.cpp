@@ -1,4 +1,14 @@
-//Knapsack II
+// Knapsack II (indexado por valor)
+//
+// Inverte os eixos do knapsack classico: dp[i][val] = menor peso necessario
+// para atingir exatamente `val` de valor usando os itens [1, i]. Util quando
+// a soma dos valores (MAXV) e pequena mas a capacidade W e grande
+//
+// Complexidades:
+// pd - O(n * MAXV)
+//
+// chamar pd(n, val) para val de sum(arr) ate 0 e pegar o maior val tal que
+// pd(n, val) <= W; nao esquecer memset(dp, -1, sizeof(dp))
 int dp[MAXN][MAXV];
 int n, W;
 int arr[MAXN], weights[MAXN];

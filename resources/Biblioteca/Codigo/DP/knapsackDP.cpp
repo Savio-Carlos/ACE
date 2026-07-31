@@ -1,4 +1,12 @@
-//Knapsack recursivo
+// Knapsack 0/1 (recursivo)
+//
+// dp[i][w] = valor maximo obtido usando os itens [i, n) dado que ja foi
+// usado w de peso, com capacidade total k
+//
+// Complexidades:
+// pd - O(n*k)
+//
+// chamar pd(0, 0); nao esquecer memset(dp, -1, sizeof(dp))
 int dp[MAXN][MAXM];
 
 int n, k;

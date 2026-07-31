@@ -1,17 +1,15 @@
-//LCA Sparse Table
-
-/*
-Fazer um euler tour na arvore e inserir todas as vezes que visitamos um no
-Junto disso inserir a depth desse no em outro vetor
-no final, o intervalo entre a e b sera representado por todos os nos que visitamos no caminho entre a e b
-basta pegar o o no com altura minima nesse intervalo
-para saber o ponto incial desse intervalo, basta pegar o tin de a e b
-
-build O(N LOG N)
-query O(1)
-
-posso pensar em otimizar como chamo o lca guardando a ultima vez que o no foi chamado
-*/
+// LCA - Sparse Table (Euler Tour + RMQ)
+//
+// Faz um euler tour da arvore (guardando a depth de cada visita) e usa uma
+// sparse table para achar o no de menor depth no intervalo do tour entre a e b (RMQ estatico)
+//
+// Complexidades:
+// build (dfs + buildtable) - O(n log(n))
+// query / lca - O(1)
+//
+// grafo global graph (0-indexado); chamar dfs(root, root) e depois buildtable()
+// posso pensar em otimizar como chamo o lca guardando a ultima vez que o no foi chamado
+// main() abaixo eh um exemplo completo de uso (le a arvore e responde queries)
 
 int n, timer = 0, tin[MAX], depth[MAX];
 vector<int> et;

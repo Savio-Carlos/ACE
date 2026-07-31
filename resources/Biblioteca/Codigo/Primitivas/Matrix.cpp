@@ -1,4 +1,16 @@
-//Matrix Exponentiation
+// Matrix Exponentiation
+//
+// matrix: struct que estende vector<vector<int>>, com multiplicacao
+// (mod MOD) e exponenciacao rapida por operator^
+//
+// Complexidades:
+// operator* (multiplicacao n x m por m x k) - O(n*m*k)
+// operator^ (exponenciacao pra potencia e) - O(n^3 log(e))
+//
+// instancia: matrix m(n, m2) para uma matriz n x m2 zerada, ou
+// matrix m(n, n, true) para a identidade n x n
+// tambem constroi a partir de um vector<vector<int>> existente
+// usa MOD global nas operacoes; operator^ assume matriz quadrada
 struct matrix : vector<vector<int>> {
     int n, m;
 

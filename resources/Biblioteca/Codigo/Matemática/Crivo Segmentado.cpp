@@ -1,4 +1,12 @@
-//Segmented Sieve
+// Crivo Segmentado
+//
+// Marca quais numeros no intervalo [L, R] sao primos
+// usar quando R eh muito grande para um crivo normal mas R - L eh pequeno
+//
+// Complexidades:
+// O((R - L + 1) log(log(R)) + sqrt(R) log(log(sqrt(R))))
+//
+// segmentedSieve(L, R) -> retorna vetor onde isPrime[i] indica se (i + L) eh primo
 
 vector<char> segmentedSieve(long long L, long long R) {
     // generate all primes up to sqrt(R)

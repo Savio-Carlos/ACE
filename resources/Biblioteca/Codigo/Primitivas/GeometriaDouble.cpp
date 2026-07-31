@@ -1,4 +1,21 @@
-//Geometria Double
+// Geometria Double
+//
+// point: ponto/vetor 2D com coordenadas double
+// line: reta/segmento definido por dois pontos (p, q)
+// funcoes de geometria plana: distancia, angulo, area, rotacao, projecao,
+// intersecao de retas/segmentos, mediatriz, bissetriz, circulo por 3 pontos,
+// ponto dentro de poligono, convex hull, etc.
+//
+// Complexidades:
+// operacoes de point (soma, produto escalar/vetorial, dist, angle, etc) - O(1)
+// inter, interseg, proj, segpoint, segseg, bissetriz, findcircle - O(1)
+// polarSort - O(n log(n))
+// inpol (ponto em poligono) - O(n)
+// convex_hull - O(n log(n))
+//
+// todas as comparacoes usam eq()/eps (definido como 1e-9); ajustar conforme
+// a precisao/escala do problema. usar essa versao quando precisar de
+// angulos, rotacao ou coordenadas nao inteiras (ao contrario de GeometriaINT)
 
 typedef double ld;
 const ld DINF = 1e18;

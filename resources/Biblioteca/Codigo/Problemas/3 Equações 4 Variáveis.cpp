@@ -1,4 +1,13 @@
-//3 equacoes 4 variaveis
+// 3 Equações, 4 Variáveis
+//
+// Sistema de 3 equacoes lineares com 4 variaveis (n, e, w, s), onde s e
+// livre. Minimiza o maior valor absoluto entre n, e, w, s: cada restricao
+// |var| <= M vira um intervalo valido de s, intersecta os 4 intervalos e
+// usa o ponto medio do intervalo resultante como resposta.
+//
+// Complexidades:
+// por query - O(1)
+
 // n(s) = r + s
 // e(s) = (y+p-r)/2 - s
 // w(s) = (y-p-r)/2 - s

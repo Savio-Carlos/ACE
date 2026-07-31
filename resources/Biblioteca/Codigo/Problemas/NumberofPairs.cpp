@@ -1,4 +1,14 @@
-//Number of Pairs (GCD e LCM)
+// Number of Pairs (GCD e LCM)
+//
+// Dados c, d, x, conta o numero de pares (a, b) com c*lcm(a,b) - d*gcd(a,b)
+// = x. Fixa g = gcd(a,b) como divisor de x, resolve para o produto
+// (a/g)*(b/g) = goal, e conta pares coprimos (a/g, b/g) com esse produto:
+// cada fator primo distinto de goal pode ir para a/g ou para b/g, dando
+// 2^(numero de fatores primos distintos de goal) combinacoes.
+//
+// Complexidades:
+// pre-processamento (crivo do menor fator primo) - O(MAX log log MAX)
+// por query - O(sqrt(x))
 /*
 alguma coisa de manipular a expressao ja que o lcm(a,b) = a*b/gcd(a,b)
 x = c*(a*b/gcd(a,b)) - d*gcd(a,b)

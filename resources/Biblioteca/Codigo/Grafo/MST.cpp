@@ -1,4 +1,13 @@
-//Minimum Spanning Tree
+// Minimum Spanning Tree (Kruskal)
+//
+// Acha o custo da MST de um grafo ponderado nao dirigido, ordenando as
+// arestas por peso e unindo componentes com DSU (union by size)
+//
+// Complexidades:
+// solve - O(m log(m))
+//
+// solve() le o grafo e acumula o custo em cost; se precisar reconstruir a
+// arvore, guardar as arestas (u, v) toda vez que dsu.merge(u, v) retornar true
 
 struct DSU {
 	vector<int> comp, sz;

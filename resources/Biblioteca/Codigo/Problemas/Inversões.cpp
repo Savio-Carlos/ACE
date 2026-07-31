@@ -1,4 +1,12 @@
-//Inversões
+// Inversões
+//
+// Conta o numero de pares (i, j) com i < j e arr[i] > arr[j], via merge
+// sort: durante o merge, toda vez que um elemento da metade direita e
+// escolhido antes de um da esquerda, ele forma inversao com todos os
+// elementos restantes da esquerda.
+//
+// Complexidades:
+// O(n log n)
 
 int countAndMerge(vector<int>& arr, int l, int m, int r) {
     int n1 = m - l + 1, n2 = r - m;

@@ -1,5 +1,17 @@
-//Bridge Tree
-// Acha as bridges do grafo e monta a bridge tree
+// Bridge Tree
+//
+// Acha as pontes (bridges) do grafo com Tarjan (low-link) e agrupa os
+// vertices em componentes 2-aresta-conexas (particao definida pelas bridges)
+//
+// Complexidades:
+// dfs - O(n + m)
+//
+// grafo global graph[MAX]; chamar dfs(v, -1) para cada componente conexa nao visitada
+// comp[v] = id da componente 2-aresta-conexa de v (1-indexado, comeca em 1)
+// compgraph[c] = lista de vertices originais dentro da componente c
+// NAO monta as arestas da bridge tree entre componentes, so agrupa os vertices;
+// para isso, conectar comp[u]-comp[v] para cada aresta original (u,v) com comp[u] != comp[v]
+// assume grafo simples (sem arestas paralelas entre o mesmo par de vertices)
 
 int t, c, low[MAX], pre[MAX], visited[MAX], comp[MAX];
 stack<int> st;

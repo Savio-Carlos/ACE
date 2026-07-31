@@ -1,6 +1,14 @@
-//Simspons Paradox
+// Paradoxo de Simpson
 //
-//Trend or pattern that appears in different groups of data is inconsistent 
+// Constroi (de forma construtiva, nao algoritmica geral) um dataset com n
+// categorias e m problemas resolvidos/tentados por time que ilustra o
+// paradoxo de Simpson: um time tem taxa de acerto maior categoria a
+// categoria, mas menor no total agregado.
+//
+// Complexidades:
+// O(n)
+//
+//Trend or pattern that appears in different groups of data is inconsistent
 //(disappears or even reverses) with what we see when the groups are combined.
 //
 //

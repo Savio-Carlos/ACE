@@ -1,7 +1,15 @@
-//Intervalo da String Palíndromico
-
-//Acha o maior intervalo que pode ser reoordenado como palindrome numa string
-//Pode ser adaptado para contar quantos palindromes e possivel fazer 
+// Intervalo de String Palíndromico
+//
+// Acha o maior intervalo [l, i] de uma string que pode ser reordenado
+// para formar um palindromo (no maximo 1 caractere com contagem impar).
+// Usa bitmask de paridade por caractere (prefix XOR) e guarda a primeira
+// posicao em que cada mascara apareceu; testa a propria mascara e as 26
+// mascaras a 1 bit de distancia (permitindo 1 caractere impar).
+//
+// Complexidades:
+// O(n * 26)
+//
+// Pode ser adaptado para contar quantos palindromos e possivel fazer
 
 int size = (1<<26);
 vector<int> first(size, -1);

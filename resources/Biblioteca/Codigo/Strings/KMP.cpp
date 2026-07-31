@@ -1,4 +1,16 @@
-//KMP
+// KMP
+//
+// Prefix function: para cada posicao i, calcula o tamanho do maior
+// prefixo proprio de s[0..i] que tambem e sufixo de s[0..i]
+// Usado pra casamento de padrao (concatenar padrao + separador + texto
+// e olhar onde pi[i] == |padrao|)
+//
+// Complexidades:
+// prefix_function - O(|s|)
+// kmp             - O(|s|)
+//
+// prefix_function(s) e kmp(s) sao duas implementacoes equivalentes,
+// retornam o vetor pi onde pi[i] e o tamanho do maior prefixo=sufixo de s[0..i]
 vector<int> prefix_function(string s) {
     int n = (int)s.length();
     vector<int> pi(n);

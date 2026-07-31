@@ -1,4 +1,23 @@
-//Geometria Int
+// Geometria Int
+//
+// pt: ponto/vetor 2D com coordenadas inteiras (sem erro de precisao)
+// line: reta/segmento definido por dois pontos (p, q)
+// funcoes de geometria plana: orientacao, area, distancia, colinearidade,
+// intersecao de segmentos, ponto dentro de poligono, convex hull, etc.
+//
+// Complexidades:
+// operacoes de pt (soma, produto escalar/vetorial, orientation, etc) - O(1)
+// intersect, isinseg, onLine, sarea2, col - O(1)
+// polarSort - O(n log(n))
+// inpol (ponto em poligono) - O(n)
+// convex (fecho convexo) - O(n log(n))
+// segpts (pontos inteiros no segmento) - O(log(max coordenada))
+//
+// tudo em inteiro, entao nao precisa de eps (usar essa versao quando as
+// coordenadas cabem em int e nao ha necessidade de angulos/raizes)
+// cuidado com overflow no produto vetorial/escalar com coordenadas grandes
+// obs: convex() usa ccw(), que nao esta definida nesse arquivo -- definir
+// (ex: ccw(p,q,r) = orientation(p,q,r) > 0) antes de usar o convex hull daqui
 
 struct pt {
     int x, y;

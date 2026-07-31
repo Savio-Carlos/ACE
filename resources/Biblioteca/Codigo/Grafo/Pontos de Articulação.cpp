@@ -1,8 +1,15 @@
-//Pontos de Articulação
-
-/*
-Acha os articulation points do grafo
-*/
+// Pontos de Articulacao
+//
+// Acha os pontos de articulacao (cut vertices) do grafo com Tarjan (low-link)
+//
+// Complexidades:
+// dfs - O(n + m)
+//
+// grafo global graph[MAX], 1-indexado; chamar dfs(1, 0) a partir da raiz
+// ans acumula os pontos de articulacao encontrados
+// criterio de raiz assume raiz = vertice 1; pra grafo desconexo, ajustar
+// esse criterio antes de chamar dfs de novo em cada componente restante
+// assume grafo simples (sem arestas paralelas entre o mesmo par de vertices)
 
 int t, c, low[MAX], pre[MAX], visited[MAX];
 vector<int> graph[MAX], ans;

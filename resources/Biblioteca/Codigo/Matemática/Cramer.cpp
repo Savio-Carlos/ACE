@@ -1,6 +1,11 @@
-//Cramer
-
-//Calcula x e y de um sistema linear com 2 equacoes e 2 variaveis
+// Regra de Cramer
+//
+// Calcula x e y de um sistema linear com 2 equacoes e 2 variaveis
+//
+// Complexidades:
+// O(1)
+//
+// se as solucoes nao forem inteiras, trocar para double e checar se det != 0 antes de dividir
 /*
 c1 * x + c2 * y = n
 c3 * x + c4 * y = m

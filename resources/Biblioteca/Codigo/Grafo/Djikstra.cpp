@@ -1,4 +1,12 @@
-//Djikstra
+// Dijkstra
+//
+// Menor caminho de uma origem st ate todos os vertices, pesos de aresta nao negativos
+//
+// Complexidades:
+// djikstra - O((n + m) log(n))
+//
+// grafo global graph[MAX] com pares {vizinho, peso}; fila de prioridade com lazy deletion
+// dist[MAX] fica com a distancia minima ao final (infinito se inalcancavel)
 
 int dist[MAX]
 void djikstra(int st){

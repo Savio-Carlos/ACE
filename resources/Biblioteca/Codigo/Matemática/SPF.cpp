@@ -1,4 +1,13 @@
 // Smallest Prime Factor
+//
+// spf[i] = menor fator primo de i, usado para fatorar rapido
+// build precisa ser chamado antes de factorize
+//
+// Complexidades:
+// build - O(MAX log(log(MAX)))
+// factorize - O(log(x))
+//
+// factorize(x) -> retorna os fatores primos de x (com repeticao)
 
 int n, spf[MAX];
 
@@ -25,7 +34,14 @@ vector<int> factorize(int x){
     return primes;
 }
 
-//Numero de fatores primos diferentes que fatoram cada numero
+// Numero de fatores primos diferentes
+//
+// pf[i] = quantidade de fatores primos DIFERENTES de i
+// build depois buildspf, nessa ordem
+//
+// Complexidades:
+// build - O(MAX log(log(MAX)))
+// buildspf - O(MAX)
 int spf[MAX], pf[MAX];
 
 void build(){

@@ -1,13 +1,15 @@
-// Hungaro
+// Húngaro
 //
-// Resolve o problema de assignment (matriz n x n)
-// Colocar os valores da matriz em 'a' (pode < 0)
-// assignment() retorna um par com o valor do
-// assignment minimo, e a coluna escolhida por cada linha
+// Resolve o problema de assignment (matriz de custo n x n, pode ter
+// negativos). Colocar os valores da matriz em 'a'.
+// assignment() retorna um par com o valor do assignment minimo, e a
+// coluna escolhida por cada linha.
 //
-// Se precisar calcular o produtorio da pra guardar o log(double(x)) no a[i][j]
-// -log se for maior produtorio e +log se for o menor produtorio
+// Complexidades:
 // O(n^3)
+//
+// Se precisar calcular o produtorio, guarde log(double(x)) em a[i][j]
+// (-log se quiser o maior produtorio, +log se quiser o menor).
 
 template<typename T> struct hungarian{
     int n;

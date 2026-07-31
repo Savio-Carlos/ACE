@@ -1,6 +1,21 @@
-//BIT
+// BIT (Fenwick Tree) - soma em range
+//
+// Duas variantes:
+// struct BIT - upd/sum classicos, 1-indexada (posicoes validas 1..n)
+// struct Bit - interface 0-indexada (converte pra 1-indexada por dentro),
+//              com construtor O(n) a partir de um vector e query de range
+//
+// Complexidades:
+// init/construtor  - O(n)
+// upd/update       - O(log n)
+// sum/pref/query   - O(log n)
+//
+// BIT: bit.init(n); depois bit.upd(x, v) soma v na posicao x (1-indexada,
+//      x em [1,n]); bit.sum(x) retorna a soma do prefixo [1, x]
+// Bit: Bit b(n) ou Bit b(vector<int>&) pra construir O(n);
+//      b.update(i, x) soma x na posicao i (0-indexada);
+//      b.pref(i) soma o prefixo [0, i]; b.query(l, r) soma [l, r] (0-indexada)
 struct BIT{
-	//1 indexada
     vector<int> bit;
     int n;
     void init(int _n){

@@ -1,4 +1,9 @@
-//LCS
+// LCS (Longest Common Subsequence)
+//
+// dp[i][j] = tamanho da maior subsequencia comum entre s[0..i) e t[0..j)
+//
+// Complexidades:
+// dp - O(n*m)
 int dp[MAX][MAX];
 
 string s, t;

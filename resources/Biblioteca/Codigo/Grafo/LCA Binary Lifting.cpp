@@ -1,4 +1,13 @@
-//LCA Binary Lifting
+// LCA - Binary Lifting
+//
+// Duas implementacoes alternativas de LCA por binary lifting -- usar so uma
+// 1) funcoes soltas: chamar dfs(root, root) e depois lca(a, b)
+// 2) struct LCA: 1-indexado (raiz = 1); add(a, b) pra cada aresta, dfs() e
+//    depois lca(a, b) / dist(a, b) / raise(node, dist) (sobe "dist" na arvore)
+//
+// Complexidades:
+// build (dfs) - O(n log(n))
+// lca / dist / raise - O(log(n))
 
 int n, ancestor[MAXN][LOG+1], depth[MAXN], visited[MAXN];
 vector<vector<int>> graph;

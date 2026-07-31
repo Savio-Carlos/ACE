@@ -54,7 +54,22 @@ namespace SegTree {
 }
 
 
-//struct
+// struct SegTree (variante: range assign + range max, 0-indexada)
+//
+// Query: maximo do range [a, b]
+// Update: atribui (set) x em cada elemento do range [a, b]
+//
+// Complexidades:
+// init   - O(n)
+// query  - O(log n)
+// update - O(log n)
+//
+// init(n) antes de usar (arrays fixos tree[4*MAX]/lazy[4*MAX], MAX global)
+// update(a, b, x)
+// query(a, b)
+// CUIDADO: lazy=0 e o sentinela de "sem pendencia", entao update(a,b,0)
+// nao propaga o valor (fica sem efeito). Se precisar atribuir 0, some 1
+// ao valor armazenado (ou troque o sentinela) antes de usar.
 struct SegTree {
     int tree[4*MAX], lazy[4*MAX];
     int n;

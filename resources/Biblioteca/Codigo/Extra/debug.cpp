@@ -1,4 +1,13 @@
-//Debug
+// Debug
+//
+// Varias implementacoes alternativas da macro debug(...), que imprime "nome = valor"
+// de cada argumento no cerr, da mais simples ate a mais completa (com cor, __LINE__,
+// __func__ e suporte a containers genericos)
+//
+// como usar: escolher UM dos blocos (sao alternativas entre si, nao usar mais de um
+// ao mesmo tempo) e chamar debug(x, y, z) pra imprimir as variaveis formatadas
+// no final tem operator<< avulsos pra imprimir vector, pair, set, map, queue,
+// deque, stack e priority_queue direto no cout/cerr
 
 /*mais simples de todos, imprime desformatado na linha*/
 void dbg_out() { cerr << endl; }

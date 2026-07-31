@@ -1,14 +1,24 @@
-//SegTree Bits
-// Segment tree para bits com suporte a posicoes invalidas.
-// v[i] = -1 => posicao invalida (nao conta)
-// v[i] = 0  => desligado
-// v[i] = 1  => ligado
+// SegTree Bits (Lazy Propagation)
 //
-// build(n2, v2)
-// query(a,b)        -> 1's em [a,b]
-// update(a,b)       -> flip em [a,b]
-// range_set(a,b,x)  -> seta intervalo [a,b] para x (0/1)
-// point_set(i, x)   -> seta posicao i para -1/0/1
+// Segment tree 0-indexada sobre um array de bits, com suporte a posicoes
+// invalidas (fora do universo, nao contam na soma):
+// v[i] = -1 -> posicao invalida (nao conta)
+// v[i] =  0 -> desligado
+// v[i] =  1 -> ligado
+//
+// Complexidades:
+// build      - O(n)
+// query      - O(log n)
+// update     - O(log n) (flip do intervalo)
+// range_set  - O(log n) (seta intervalo p/ 0 ou 1)
+// point_set  - O(log n) (seta uma posicao p/ -1, 0 ou 1)
+//
+// Depende de MAX (tamanho maximo) definido global. Indices 0-indexados.
+// build(n, v)        -> inicializa com array v de tamanho n
+// query(a, b)        -> quantidade de 1's em [a,b]
+// update(a, b)       -> flip (inverte 0/1, ignora invalidas) em [a,b]
+// range_set(a, b, x) -> seta [a,b] inteiro para x (0 ou 1)
+// point_set(i, x)    -> seta a posicao i para x (-1, 0 ou 1)
 
 namespace SegTreeBits {
     int tree[4*MAX];       // 1's no intervalo

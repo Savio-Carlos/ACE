@@ -1,4 +1,16 @@
-//Combinatoria
+// Combinatórias
+//
+// Fatorial e inverso modular pre-computados para calcular C(n, k) mod MOD
+// tambem inclui versoes de combinacao sem pre-computo (sem mod e mod)
+//
+// Complexidades:
+// build - O(MAX)
+// comb - O(1)
+// combinations - O(k), sem mod, cuidado com overflow
+// combinations_mod - O(k log(MOD)), usar quando k for pequeno e nao valer a pena o build
+//
+// build() precisa ser chamado antes de comb
+// comb(a, b) -> C(a, b) mod MOD
 
 const int MOD = 1e9+7;
 const int MOD = 998244353;

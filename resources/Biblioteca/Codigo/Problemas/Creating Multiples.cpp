@@ -1,4 +1,13 @@
-//Creating Multiples
+// Creating Multiples
+//
+// Dado um numero de l digitos em base b, decide se e possivel diminuir um
+// unico digito para tornar o numero multiplo de (b+1).
+// Usa que base ≡ -1 (mod base+1), entao o resto e a soma alternada dos
+// digitos; para cada posicao calcula quanto precisa reduzir aquele digito
+// para zerar o resto.
+//
+// Complexidades:
+// O(l)
 
 signed main(){
     winton;

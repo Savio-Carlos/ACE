@@ -1,4 +1,14 @@
-//Exponenciação Rápida
+// Exponenciação Rápida
+//
+// Calcula base^exp rapidamente (com e sem modulo)
+// modiv calcula o inverso modular via Fermat (exige MOD primo)
+//
+// Complexidades:
+// fastExpo - O(log(exp))
+// modiv - O(log(MOD))
+//
+// varias variantes abaixo: com MOD global, sem mod, com mod por parametro
+// e para long double
 
 int fastExpo(int base, int exp) {
     int res = 1;

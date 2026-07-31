@@ -1,7 +1,19 @@
-//Manacher
-
-//Manacher para achar todos os palindromes e depois reconstruir eles
-//Nao e eficiente pois utiliza substr O(size)
+// Manacher
+//
+// Acha, pra cada posicao, o tamanho do maior palindromo centrado ali
+// (contando pares e impares). Usado pra achar todos os palindromos de uma string
+// O main mostra como reconstruir as substrings, mas usa substr() a cada
+// palindromo, entao nao e eficiente (O(tamanho) por chamada)
+//
+// Complexidades:
+// manacher_odd - O(|s|)
+// manacher     - O(|s|)
+//
+// manacher_odd(s) retorna p, onde p[i]-1 e o raio do maior palindromo
+// de tamanho impar centrado em i (sem separadores)
+// manacher(s) insere separadores '#' entre os caracteres e chama manacher_odd;
+// retorna mnc onde mnc[i]-1 e o tamanho do maior palindromo (par ou impar)
+// centrado na posicao i da string transformada
 
 vector<int> manacher_odd(string s) {
     int n = s.size();

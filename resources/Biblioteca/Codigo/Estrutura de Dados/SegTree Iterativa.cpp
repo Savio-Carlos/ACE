@@ -1,4 +1,17 @@
-//SegTree Iterativa
+// SegTree Iterativa (bottom-up, sem recursao)
+//
+// Segment tree iterativa para RMQ (maximo) em range, com update pontual
+// (seta, nao soma). 0-indexada. Mais rapida na pratica que a recursiva
+// por nao ter overhead de chamadas, mas nao suporta lazy propagation.
+//
+// Complexidades:
+// build  - O(n)
+// query  - O(log n)
+// update - O(log n)
+//
+// build(n, v)  -> inicializa com array v de tamanho n (arredonda p/ potencia de 2 por dentro)
+// query(a, b)  -> maximo em [a,b], 0-indexado; retorna 0 se a>b
+// update(i, x) -> seta (nao soma) a posicao i para x
 
 namespace SegTree {
     int n;

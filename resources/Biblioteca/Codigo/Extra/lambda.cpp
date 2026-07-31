@@ -1,3 +1,11 @@
+// Lambdas - exemplos de sintaxe
+//
+// Cheatsheet de padroes uteis de lambda em C++: lambda padrao, generica (auto nos
+// parametros), recursiva (via auto&& self), lambda guardada em function<> pra
+// recursao (ex: dfs) e lambda que retorna um container diferente do de entrada
+//
+// como usar: copiar o padrao de sintaxe que precisar e adaptar tipos/corpo
+
 long long ans = 0;
 
 auto lambda_padrao = [&](int x, int y) -> int {
