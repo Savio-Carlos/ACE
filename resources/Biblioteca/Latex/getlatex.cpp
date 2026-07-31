@@ -15,10 +15,10 @@ string NO_PRINT = "noprint";
 string path = "../Codigo/";
 #ifdef __clang__
 string hash_cmd = "sed -n '1,10000p' tmp.cpp | sed '/^#w/d' "
-           "| clang -E -x c++ -dD -P - | tr -d '[:space:]' | md5sum | cut -c-";
+           "| clang -E -x c++ -dD -P - 2>/dev/null | tr -d '[:space:]' | md5sum | cut -c-";
 #else
 string hash_cmd = "sed -n '1,10000p' tmp.cpp | sed '/^#w/d' "
-"| cpp -dD -P -fpreprocessed | tr -d '[:space:]' | md5sum | cut -c-";
+"| cpp -dD -P -fpreprocessed 2>/dev/null | tr -d '[:space:]' | md5sum | cut -c-";
 #endif
 
 bool print_all = false;
@@ -26,7 +26,7 @@ bool print_all = false;
 string exec(string cmd) {
 	array<char, 128> buffer;
 	string result;
-	unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+	unique_ptr<FILE, int(*)(FILE*)> pipe(popen(cmd.c_str(), "r"), pclose);
 	if (!pipe) throw runtime_error("popen() failed!");
 	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr)
 		result += buffer.data();
@@ -73,6 +73,39 @@ bool is_comment(string line) {
 	return comment;
 }
 
+// pra cada linha, diz se ela comeca (respectivamente termina) dentro de um
+// comentario /* */ ainda nao fechado. Usado pra nunca mandar pro cpp/hash
+// um pedaco de arquivo que corte um comentario de bloco ao meio (isso da
+// "unterminated comment" no cpp, ja que ele so ve aquele pedacinho isolado)
+pair<vector<bool>, vector<bool>> get_comment_state(const vector<string>& lines) {
+	vector<bool> open_at_start(lines.size()), open_at_end(lines.size());
+	bool in_comment = false;
+	for (int i = 0; i < (int)lines.size(); i++) {
+		open_at_start[i] = in_comment;
+		const string& line = lines[i];
+		for (int j = 0; j < (int)line.size(); j++) {
+			if (!in_comment) {
+				if (line[j] == '/' and j + 1 < (int)line.size() and line[j + 1] == '*') {
+					in_comment = true;
+					j++;
+				} else if (line[j] == '/' and j + 1 < (int)line.size() and line[j + 1] == '/') {
+					break;
+				}
+			} else if (line[j] == '*' and j + 1 < (int)line.size() and line[j + 1] == '/') {
+				in_comment = false;
+				j++;
+			}
+		}
+		open_at_end[i] = in_comment;
+	}
+	return {open_at_start, open_at_end};
+}
+
+void extend_range_for_comments(const vector<bool>& open_at_start, const vector<bool>& open_at_end, int& l, int& r) {
+	while (l > 0 and open_at_start[l]) l--;
+	while (r + 1 < (int)open_at_end.size() and open_at_end[r]) r++;
+}
+
 vector<string> split(string line, char c) {
 	vector<string> ret;
 	string cur;
@@ -117,13 +150,21 @@ void remove_flags(string& line) {
 
 void printa_arquivo_codigo(string file, bool extra = false) {
 	cout << "\\begin{lstlisting}\n";
-	ifstream fin(file.c_str());
-	string line;
+
+	vector<string> lines;
+	{
+		ifstream fin(file.c_str());
+		string line;
+		while (getline(fin, line)) lines.push_back(line);
+	}
+	auto [open_at_start, open_at_end] = get_comment_state(lines);
+
 	int count = 0;
 	bool started_code = false;
 	int depth = 0;
 	stack<int> st;
-	for (int line_idx = 0; getline(fin, line); line_idx++) {
+	for (int line_idx = 0; line_idx < (int)lines.size(); line_idx++) {
+		const string& line = lines[line_idx];
 		int start_line = line_idx;
 		if (count++ < 2 and !extra) continue;
 
@@ -137,12 +178,14 @@ void printa_arquivo_codigo(string file, bool extra = false) {
 				}
 			}
 		}
-		
+
 		bool comment = is_comment(line);
 		if (!comment) started_code = true;
 
 		if (!extra and started_code) {
-			string hash = get_hash_arquivo(file, HASH_LEN, start_line, line_idx);
+			int l = start_line, r = line_idx;
+			extend_range_for_comments(open_at_start, open_at_end, l, r);
+			string hash = get_hash_arquivo(file, HASH_LEN, l, r);
 
 			if (comment) {
 				if (depth != 0) {
@@ -153,7 +196,6 @@ void printa_arquivo_codigo(string file, bool extra = false) {
 		}
 		cout << line << endl;
 	}
-	fin.close();
 	cout << "\\end{lstlisting}\n\n";
 }
 
