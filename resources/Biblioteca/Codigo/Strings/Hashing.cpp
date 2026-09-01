@@ -4,6 +4,54 @@
 // construtor - O(|s|)
 // operator() - O(1)
 
+// ====================================================================
+// CUIDADO: as duas formas de prefix hash 
+// ====================================================================
+//
+// FORMA 1 - "potencia por posicao" (e a usada nas structs deste arquivo):
+//     h[i+1] = h[i] + s[i]*P^i
+//     get_hash(l, len) = h[l+len] - h[l]
+//
+//   O valor devolvido NAO e o hash da substring: e o hash dela
+//   MULTIPLICADO por P^l. Duas substrings IGUAIS em posicoes DIFERENTES
+//   devolvem valores DIFERENTES.
+//   => nao da pra usar direto como chave de map/set, nem comparar duas
+//      substrings que comecam em posicoes diferentes. Por isso o
+//      equal_substrings/rabin_karp aqui precisam multiplicar um dos
+//      lados por p_pow pra compensar o offset.
+//
+//   Comparar l1 com l2 (mesmo len):  h(l1)*P^l2 == h(l2)*P^l1
+//
+//   Chave canonica sem inverso modular (so quando todas as substrings
+//   tem o MESMO len, que e o caso tipico de varrer a string por tamanho):
+//       key = get_hash(i, len) * p_pow[n-1-i] % MOD
+//   vira sum s[i+k]*P^(n-1+k), que nao depende de i. Precisa p_pow ate
+//   o indice n-1 (as structs abaixo ja tem).
+//
+// FORMA 2 - Horner (recomendada pro caso geral, ver struct no fim):
+//     h[i+1] = h[i]*P + s[i]
+//     get_hash(l, len) = h[l+len] - h[l]*P^len
+//
+//   O valor depende SO do conteudo da substring. Da pra usar como chave
+//   de map, comparar posicoes quaisquer, e equal_substrings vira ==.
+//   Custo: 1 mult + 1 mod a mais por query (irrelevante perto do map) e
+//   p_pow precisa ter tamanho n+1, porque agora e indexado por len (que
+//   pode chegar a n) e nao por posicao.
+//
+// QUANDO A FORMA 1 AINDA E MELHOR:
+//   na forma 1 a contribuicao de cada posicao (s[i]*P^i) nao depende de
+//   nenhuma fronteira de substring, entao ela e "somavel":
+//     - BIT/SegTree com update de ponto: o hash do range e uma soma pura.
+//       (na forma Horner o no precisa guardar (hash, len) e o merge vira
+//        left.hash*P^right.len + right.hash)
+//     - hash de um CONJUNTO qualquer de posicoes, nao so de um intervalo.
+//   Fora esses dois casos, use a forma 2.
+//
+// ANTI-HASH: com 1 mod so e base fixa da pra ser hackado. 
+//   mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+//   const int P = uniform_int_distribution<int>(256, MOD-2)(rng);
+// ====================================================================
+
 //string matching
 vector<int> rabin_karp(string const& s, string const& t) {
     int S = s.size(), T = t.size();
@@ -123,6 +171,33 @@ struct hashing {
         int left  = (h1 * p_pow[n-len]) % MOD;
         int right = (h2) % MOD;
         return left == right;
+    }
+};
+
+//FORMA 2 (Horner) - hash de uma string so
+//get_hash devolve valor canonico: substrings iguais => hashes iguais,
+//independente da posicao. Pode jogar direto em map/set.
+struct hashing_horner {
+    vector<int> h, p_pow;
+    string s;
+    int n;
+
+    hashing_horner(string _s) : n(_s.size()), s(_s), h(_s.size()+1, 0), p_pow(_s.size()+1, 0) {}
+
+    void build(){
+        p_pow[0] = 1;
+        //p_pow indexado por LEN, entao vai ate n (e nao ate n-1)
+        for (int i = 1; i <= n; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
+        for (int i = 0; i < n; i++) h[i+1] = (h[i] * P + (s[i] - 'a' + 1)) % MOD;
+    }
+
+    //hash de s[l .. l+len-1]
+    int get_hash(int l, int len){
+        return ((h[l+len] - h[l] * p_pow[len] % MOD) + MOD) % MOD;
+    }
+
+    bool equal_substrings(int i, int j, int len){
+        return get_hash(i, len) == get_hash(j, len);
     }
 };
 
